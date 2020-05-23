@@ -9,6 +9,13 @@ public class Counter : MonoBehaviour
 
     public bool addOnTop(GameObject o)
     {
+        Recipient r = onTop as Recipient;
+        if (r != null)
+        {
+            bool b = r.addFood(o);
+            Destroy(o);
+            return b;
+        }
         if (hasItem) return false;
         o.transform.position = this.transform.position + new Vector3(0, 0, -1);
         onTop = o.GetComponent<Item>();
@@ -18,6 +25,13 @@ public class Counter : MonoBehaviour
 
     public bool addOnTop(Item o)
     {
+        Recipient r = onTop as Recipient;
+        if (r != null)
+        {
+            bool b = r.addFood(o.gameObject);
+            Destroy(o.gameObject);
+            return b;
+        }
         if (hasItem) return false;
         o.gameObject.transform.position = this.transform.position + new Vector3(0,0,-1);
         o.transform.parent = null;
@@ -39,4 +53,5 @@ public class Counter : MonoBehaviour
         return true;
 
     }
+
 }

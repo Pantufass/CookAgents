@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Plate : MonoBehaviour
+public class Plate : Recipient
 {
     public Soup soup;
     public List<Food> salad;
@@ -17,7 +17,7 @@ public class Plate : MonoBehaviour
     public Sprite Osoup;
     public Sprite fullSalad;
 
-    public bool addFood(GameObject f)
+    public override bool addFood(GameObject f)
     {
         if (!full)
         {

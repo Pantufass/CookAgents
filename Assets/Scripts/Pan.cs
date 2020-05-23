@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pan : Item
+public class Pan : Recipient
 {
     public Soup soup;
 
@@ -16,5 +16,11 @@ public class Pan : Item
         soup = new Soup();
     }
 
+    public override bool addFood(GameObject o)
+    {
+        Food f = o.GetComponent<Food>();
+        if(f != null) return soup.addFood(f);
+        return false;
+    }
 
 }

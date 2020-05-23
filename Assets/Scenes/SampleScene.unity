@@ -665,10 +665,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 277173562}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d74c541aa58b4bc4aa98fe19ca9fb7fe, type: 3}
+  m_Script: {fileID: 11500000, guid: 3cc8a714db5ea804791f5dd9914a19d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   t: 3
+  soup: {fileID: 0}
+  salad: []
+  full: 0
+  nolet: 1
+  notom: 1
+  wTom: {fileID: 0}
+  wLet: {fileID: 0}
+  Tsoup: {fileID: 0}
+  Osoup: {fileID: 0}
+  fullSalad: {fileID: 0}
 --- !u!212 &277173564
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4529,7 +4539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd984e49596787f4192bfe61d8780852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onTop: {fileID: 277173563}
+  onTop: {fileID: 0}
   hasItem: 1
 --- !u!1 &1122042384
 GameObject:
@@ -5847,10 +5857,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1286820773}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d74c541aa58b4bc4aa98fe19ca9fb7fe, type: 3}
+  m_Script: {fileID: 11500000, guid: e290bb803d0238b4db896d5f523626e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   t: 4
+  soup: {fileID: 0}
 --- !u!212 &1286820775
 SpriteRenderer:
   m_ObjectHideFlags: 0

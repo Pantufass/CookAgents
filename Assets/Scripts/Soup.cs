@@ -13,7 +13,7 @@ public class Soup : MonoBehaviour, PlatableFood
         return cooking.Count == 3;
     }
 
-    public void addFood(Food f)
+    public bool addFood(Food f)
     {
         if(cooking.Count < 3 && f.cut )
         {
@@ -22,13 +22,16 @@ public class Soup : MonoBehaviour, PlatableFood
                 if (f.t == type())
                 {
                     cooking.Add(f);
+                    return true;
                 }
             }
             else
             {
                 cooking.Add(f);
+                return true;
             }
       }
+        return false;
     }
 
     public Item.type type()
