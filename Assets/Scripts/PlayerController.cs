@@ -17,7 +17,10 @@ public class PlayerController : MonoBehaviour
     private Counter c = null;
     private void Start()
     {
-        front = new Vector3(0, 1, 0);
+        front = this.gameObject.transform.position;
+
+        ground = GameObject.Find("Ground");
+
         foreach(Transform t in ground.transform)
         {
             positions.Add(new Vector3(t.position.x, t.position.y, -1));
@@ -33,6 +36,7 @@ public class PlayerController : MonoBehaviour
         List<bool> commands = getInput();
 
         int xValue = 0, yValue = 0, up = 0;
+
 
         //move left
         if (commands[0]) xValue -= 1;
@@ -113,6 +117,5 @@ public class PlayerController : MonoBehaviour
         com.Add(Input.GetKey(KeyCode.Z));
         return com;
     }
-    
-
+  
 }
