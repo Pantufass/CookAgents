@@ -5,13 +5,20 @@ using UnityEngine;
 public class Soup : MonoBehaviour, PlatableFood
 {
 
-    private List<Food> cooking = new List<Food>();
+    private List<Food> cooking;
 
-    private bool done = false;
+    private bool done;
     public bool canBoil()
     {
         return cooking.Count == 3;
     }
+
+    public Soup()
+    {
+        cooking = new List<Food>();
+        done = false;
+    }
+
 
     public bool addFood(Food f)
     {

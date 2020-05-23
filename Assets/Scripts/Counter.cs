@@ -28,9 +28,12 @@ public class Counter : MonoBehaviour
         Recipient r = onTop as Recipient;
         if (r != null)
         {
-            bool b = r.addFood(o.gameObject);
-            Destroy(o.gameObject);
-            return b;
+            if (r.addFood(o.gameObject))
+            {
+                Destroy(o.gameObject);
+                return true;
+            }
+            return false;
         }
         if (hasItem) return false;
         o.gameObject.transform.position = this.transform.position + new Vector3(0,0,-1);

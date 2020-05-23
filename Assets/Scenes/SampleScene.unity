@@ -6728,8 +6728,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 289186f96a494ee459b0c899f55ce1d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onTop: {fileID: 0}
-  hasItem: 0
+  onTop: {fileID: 1286820774}
+  hasItem: 1
 --- !u!1 &1411748918
 GameObject:
   m_ObjectHideFlags: 0

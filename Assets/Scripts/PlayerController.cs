@@ -14,10 +14,10 @@ public class PlayerController : MonoBehaviour
 
     private bool holding = false;
     private bool triggered = false;
-    private Counter c = null;
+    public Counter c = null;
     private void Start()
     {
-        front = new Vector3(0,1,0);
+        front = new Vector3(0,1.05f,0);
 
         ground = GameObject.FindGameObjectWithTag("Ground");
 
@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
         col.offset = front;
         col.isTrigger = true;
         col.enabled = true;
-        col.size = new Vector2(0.9f, 0.9f);
+        col.size = new Vector2(0.8f, 0.8f);
     }
 
     void Update()
