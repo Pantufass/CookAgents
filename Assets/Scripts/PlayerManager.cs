@@ -21,10 +21,29 @@ public class PlayerManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        getPositions();
+
+        spawnPlayers();
+
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    private void getPositions()
+    {
         foreach (Transform t in ground.transform)
         {
             positions.Add(new Vector3(t.position.x, t.position.y, -1));
         }
+    }
+
+    private void spawnPlayers()
+    {
         for (int i = 0; i < PLAYERNUMBER; i++)
         {
             Vector3 position = positions[Random.Range(0, positions.Count - 1)];
@@ -39,11 +58,5 @@ public class PlayerManager : MonoBehaviour
 
             players.Add(player);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

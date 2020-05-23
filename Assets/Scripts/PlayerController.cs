@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject ground; 
+    public GameObject ground;
+
+    private GameObject agent;
 
     private List<Vector3> positions = new List<Vector3>();
 
@@ -15,6 +17,12 @@ public class PlayerController : MonoBehaviour
     private bool holding = false;
     private bool triggered = false;
     private Counter c = null;
+
+    public PlayerController(GameObject agent)
+    {
+        this.agent = agent;
+    }
+
     private void Start()
     {
         front = new Vector3(0,1,0);
