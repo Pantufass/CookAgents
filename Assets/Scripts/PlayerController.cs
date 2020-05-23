@@ -5,13 +5,16 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject ground; 
+
     private List<Vector3> positions = new List<Vector3>();
-    private GameObject hold;
+
+    private Item hold;
     private Vector3 front;
     private BoxCollider2D col;
 
-    private bool pickup = false;
-    private bool use = false;
+    private bool holding = false;
+    private bool triggered = false;
+    private Counter c = null;
     private void Start()
     {
         front = new Vector3(0, 1, 0);
@@ -22,12 +25,13 @@ public class PlayerController : MonoBehaviour
         col = gameObject.AddComponent<BoxCollider2D>();
         col.offset = front;
         col.isTrigger = true;
-        col.enabled = false;
+        col.enabled = true;
     }
 
     void Update()
     {
         List<bool> commands = getInput();
+
         int xValue = 0, yValue = 0, up = 0;
 
         //move left
@@ -40,15 +44,21 @@ public class PlayerController : MonoBehaviour
         if (commands[3]) yValue -= 1;
 
         //rotate left
-        if (commands[4]) up -= 1;
+        if (commands[4]) up += 1;
         //rotate right
-        if (commands[5]) up += 1;
+        if (commands[5]) up -= 1;
 
-        //pick up
-        if (commands[6]) pickUp();
-        //use
-        if (commands[7]) useAction();
-
+        if(c != null && triggered)
+        {
+            //pick up
+            if (commands[6]) c.use(gameObject);
+            //use
+            if (commands[7])
+            {
+                if (holding) c.addOnTop(hold);
+                else c.pickUp(gameObject);
+            }
+        }
         Vector3 a = transform.position + new Vector3(xValue,yValue);
         if (positions.Contains(a))
         {
@@ -57,35 +67,31 @@ public class PlayerController : MonoBehaviour
         }
         transform.Rotate(up*new Vector3(0,0,1),90f);
         front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
-        Debug.Log(front);
     }
 
-    private void pickUp()
-    {
-        col.enabled = true;
-        pickup = true;
-    }
-
-    private void useAction()
-    {
-        col.enabled = true;
-        use = true;
-    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Counter c = collision.gameObject.GetComponent<Counter>();
-        if (c != null)
+        triggered = true;
+        c = collision.gameObject.GetComponent<Counter>();
+        
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        triggered = false;
+        c = null;
+    }
+
+    public bool holdItem(Item i)
+    {
+        if (!holding)
         {
-            if (use)
-            {
-
-            }
-            else if (pickup)
-            {
-
-            }
+            hold = i;
+            holding = true;
+            return true;
         }
+        return false;
     }
 
     private List<bool> getInput()
