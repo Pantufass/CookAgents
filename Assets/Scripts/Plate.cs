@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class Plate : Recipient
 {
-    public Soup soup;
-    public List<Food> salad;
 
-    public bool full = false;
-    public bool nolet = true;
-    public bool notom = true;
+    public enum State { empty, salad, tomato, lettuce, tomSoup, onSoup}
+    public State s;
+    public bool full;
 
     public Sprite wTom;
     public Sprite wLet;
@@ -17,54 +15,82 @@ public class Plate : Recipient
     public Sprite Osoup;
     public Sprite fullSalad;
 
+
+    public Soup soup;
+    public Food spot1;
+    public Food spot2;
+
+    private void Start()
+    {
+        s = State.empty;
+        full = false;
+    }
+
     public override bool addFood(GameObject f)
     {
         if (!full)
         {
-            if(f.GetComponent<Soup>() != null && salad.Count == 0)
+            if(f.GetComponent<Soup>() != null && s == State.empty)
             {
                 soup = f.GetComponent<Soup>();
                 full = true;
-                if (soup.type() == Item.type.onion) GetComponent<SpriteRenderer>().sprite = Osoup;
-                else if (soup.type() == Item.type.tomato) GetComponent<SpriteRenderer>().sprite = Tsoup;
+                if (soup.type() == Item.type.onion){
+                    GetComponent<SpriteRenderer>().sprite = Osoup;
+                    s = State.onSoup;
+                }
+                else if (soup.type() == Item.type.tomato) {
+                    GetComponent<SpriteRenderer>().sprite = Tsoup;
+                    s = State.tomSoup;
+                }
                 return true;
             }
-            else if(f.GetComponent<Food>() != null)
-            {
-                if(f.GetComponent<Food>().t == Item.type.lettuce && nolet && f.GetComponent<Food>().cut)
+            else{
+                Food food = f.GetComponent<Food>();
+                if (food != null)
                 {
-                    salad.Add(f.GetComponent<Food>());
-                    if (salad.Count == 2)
+                    if (food.t == Item.type.lettuce && s != State.lettuce && food.cut)
                     {
-                        GetComponent<SpriteRenderer>().sprite = fullSalad;
-                        full = true;
+                        if (spot1 == null)
+                        {
+                            GetComponent<SpriteRenderer>().sprite = wLet;
+                            spot1 = food;
+                        }
+                        else
+                        {
+                            GetComponent<SpriteRenderer>().sprite = fullSalad;
+                            spot2 = food;
+                            full = true;
+                        }
+                        return true;
                     }
-                    else
+                    else if (food.t == Item.type.tomato && s != State.tomato && food.cut)
                     {
-                        GetComponent<SpriteRenderer>().sprite = wLet;
+                        if (spot1 == null)
+                        {
+                            GetComponent<SpriteRenderer>().sprite = wTom;
+                            spot1 = food;
+                        }
+                        else
+                        {
+                            GetComponent<SpriteRenderer>().sprite = fullSalad;
+                            spot2 = food;
+                            full = true;
+                        }
+                        return true;
                     }
-                    nolet = false;
-                    return true;
-                }
-                else if (f.GetComponent<Food>().t == Item.type.tomato && notom && f.GetComponent<Food>().cut)
-                {
-                    salad.Add(f.GetComponent<Food>());
-                    if (salad.Count == 2)
-                    {
-                        GetComponent<SpriteRenderer>().sprite = fullSalad;
-                        full = true;
-                    }
-                    else
-                    {
-                        GetComponent<SpriteRenderer>().sprite = wTom;
-                    }
-                    notom = false;
-                    return true;
                 }
             }
         }
         return false;
     }
 
+
+    public void Empty()
+    {
+        spot1 = null;
+        spot2 = null;
+        s = State.empty;
+        full = false;
+    }
     
 }

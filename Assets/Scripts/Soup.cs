@@ -19,6 +19,10 @@ public class Soup : MonoBehaviour, PlatableFood
         done = false;
     }
 
+    public int numItems()
+    {
+        return cooking.Count;
+    }
 
     public bool addFood(Food f)
     {

@@ -674,11 +674,11 @@ MonoBehaviour:
   full: 0
   nolet: 1
   notom: 1
-  wTom: {fileID: 0}
-  wLet: {fileID: 0}
-  Tsoup: {fileID: 0}
-  Osoup: {fileID: 0}
-  fullSalad: {fileID: 0}
+  wTom: {fileID: 21300000, guid: e24f97d545cad794183839257fb4d541, type: 3}
+  wLet: {fileID: 21300000, guid: 71401b88df9345c4c93ace8a6069464b, type: 3}
+  Tsoup: {fileID: 21300000, guid: abf87581e9764d04a8513b66f6f4aa80, type: 3}
+  Osoup: {fileID: 21300000, guid: d837b81d4ef1f0147970badcf2033983, type: 3}
+  fullSalad: {fileID: 21300000, guid: b6db110fa03da8a44b04c6fc8e33ba0e, type: 3}
 --- !u!212 &277173564
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -737,7 +737,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 277173562}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalPosition: {x: 5, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -5794,6 +5794,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   t: 4
   soup: {fileID: 0}
+  OPan:
+  - {fileID: 21300000, guid: 4edff1c378f8d5b409b6d8f5d4255910, type: 3}
+  - {fileID: 21300000, guid: 08a8df84d6bf829479f02a01aa8e6a47, type: 3}
+  - {fileID: 21300000, guid: 602d78ba13f8f3d4f9d64395c8ae5adb, type: 3}
+  - {fileID: 21300000, guid: 3cc8905a5f10b5c408184b7d869d8d45, type: 3}
+  TPan:
+  - {fileID: 21300000, guid: 5664111b37ede8d438612079de3db8dc, type: 3}
+  - {fileID: 21300000, guid: a566dec307642d546ba002676c98cf10, type: 3}
+  - {fileID: 21300000, guid: a3bce0896f3ba414dbdabc913f0563b0, type: 3}
+  - {fileID: 21300000, guid: 00d98abb56afd944e9ae4511c23e9047, type: 3}
 --- !u!212 &1286820775
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5833,12 +5843,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 674b2f8000c11824f849e87c6ace7589, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 52c1a78483a73294ca17182030d724d6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.32, y: 0.32}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
