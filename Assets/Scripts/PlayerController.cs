@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
         col.enabled = true;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         List<bool> commands = getInput();
 

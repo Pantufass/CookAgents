@@ -9,6 +9,9 @@ public class PlayerManager : MonoBehaviour
 
     public List<GameObject> playerPrefabs = new List<GameObject>();
 
+    private List<GameObject> players = new List<GameObject>();
+
+
     private List<Vector3> positions = new List<Vector3>();
 
     private List<Vector3> ocupiedPositions = new List<Vector3>();
@@ -33,6 +36,8 @@ public class PlayerManager : MonoBehaviour
             ocupiedPositions.Add(position);
 
             GameObject player = Instantiate(playerPrefabs[i], position, Quaternion.identity);
+
+            players.Add(player);
         }
     }
 
