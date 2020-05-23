@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class CutttingBoard : Counter
 {
-    public void Cut()
+
+    public override bool use(GameObject player)
     {
         Food f = onTop as Food;
-        if(f != null)
+        if (f != null)
         {
             if (!f.cut)
             {
                 f.Cut();
             }
         }
-
+        return false;
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pan : MonoBehaviour
+public class Pan : Item
 {
     public Soup soup;
 

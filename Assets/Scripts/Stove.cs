@@ -5,12 +5,18 @@ using UnityEngine;
 public class Stove : Counter
 {
     
-    public void Cook(Pan p)
+    public override bool use(GameObject player)
     {
-        if(p.soup.canBoil())
+        Pan p = onTop as Pan;
+        if(p != null)
         {
-            p.soup.Boiled();
+            if (p.soup.canBoil())
+            {
+                p.soup.Boiled();
+                return true;
+            }
         }
+        return false;
     }
 
 }
