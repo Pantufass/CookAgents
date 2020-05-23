@@ -9,7 +9,7 @@ public class Spawner : Counter
     public override bool use(GameObject player)
     {
         GameObject g = Instantiate(spawn.gameObject, this.transform.position, Quaternion.identity);
-        return base.pickUp(player) && addOnTop(g.GetComponent<Food>() as Item);
+        return addOnTop(g.GetComponent<Food>() as Item) &&base.pickUp(player) ;
     }
 
     public new bool pickUp(GameObject player)

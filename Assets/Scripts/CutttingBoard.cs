@@ -5,7 +5,7 @@ using UnityEngine;
 public class CutttingBoard : Counter
 {
 
-    public override void use(GameObject player)
+    public override bool use(GameObject player)
     {
         Food f = onTop as Food;
         if (f != null)
@@ -13,7 +13,9 @@ public class CutttingBoard : Counter
             if (!f.cut)
             {
                 f.Cut();
+                return true;
             }
         }
+        return false;
     }
 }
