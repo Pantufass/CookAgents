@@ -13,6 +13,7 @@ public class CutttingBoard : Counter
             if (!f.cut)
             {
                 f.Cut();
+                return true;
             }
         }
         return false;
