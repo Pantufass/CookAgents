@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
 
     private GameObject agent;
 
-    private List<Vector3> positions = new List<Vector3>();
+    private List<Vector3> positions;
 
     private Item hold;
     private Vector3 front;
@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 
     private bool holding = false;
     private bool triggered = false;
+
     private Counter c = null;
 
     public PlayerController(GameObject agent)
@@ -25,7 +26,9 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        front = new Vector3(0,1,0);
+        front = this.transform.position;
+
+        positions = new List<Vector3>();
 
         ground = GameObject.FindGameObjectWithTag("Ground");
 
@@ -37,10 +40,10 @@ public class PlayerController : MonoBehaviour
         col.offset = front;
         col.isTrigger = true;
         col.enabled = true;
-        col.size = new Vector2(0.9f, 0.9f);
+        col.size = new Vector2(0.8f, 0.8f);
     }
 
-    void Update()
+    void LateUpdate()
     {
         List<bool> commands = getInput();
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Pan : Recipient
 {
-    public Soup soup;
+    public Soup soup = new Soup();
 
     private void Start()
     {
@@ -19,7 +19,10 @@ public class Pan : Recipient
     public override bool addFood(GameObject o)
     {
         Food f = o.GetComponent<Food>();
-        if(f != null) return soup.addFood(f);
+        if (f != null)
+        {
+            return soup.addFood(f);
+        }
         return false;
     }
 
