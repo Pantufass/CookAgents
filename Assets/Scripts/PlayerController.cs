@@ -17,9 +17,9 @@ public class PlayerController : MonoBehaviour
     private Counter c = null;
     private void Start()
     {
-        front = this.gameObject.transform.position;
+        front = new Vector3(0,1,0);
 
-        ground = GameObject.Find("Ground");
+        ground = GameObject.FindGameObjectWithTag("Ground");
 
         foreach(Transform t in ground.transform)
         {
@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
         col.offset = front;
         col.isTrigger = true;
         col.enabled = true;
+        col.size = new Vector2(0.9f, 0.9f);
     }
 
     void Update()
@@ -55,7 +56,10 @@ public class PlayerController : MonoBehaviour
         if(c != null && triggered)
         {
             //pick up
-            if (commands[6]) c.use(gameObject);
+            if (commands[6])
+            {
+                c.use(gameObject);
+            }
             //use
             if (commands[7])
             {

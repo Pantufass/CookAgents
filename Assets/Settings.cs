@@ -11,9 +11,4 @@ public class Settings : MonoBehaviour
         Application.targetFrameRate = speed;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
