@@ -14,7 +14,10 @@ public class PlayerController : MonoBehaviour
     private bool use = false;
     private void Start()
     {
-        front = new Vector3(0, 1, 0);
+        front = this.gameObject.transform.position;
+
+        ground = GameObject.Find("Ground");
+
         foreach(Transform t in ground.transform)
         {
             positions.Add(new Vector3(t.position.x, t.position.y, -1));
@@ -25,10 +28,11 @@ public class PlayerController : MonoBehaviour
         col.enabled = false;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         List<bool> commands = getInput();
-        int xValue = 0, yValue = 0, up = 0;
+        int xValue = 0, yValue = 0;
+        int up = 0;
 
         //move left
         if (commands[0]) xValue -= 1;
@@ -57,7 +61,6 @@ public class PlayerController : MonoBehaviour
         }
         transform.Rotate(up*new Vector3(0,0,1),90f);
         front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
-        Debug.Log(front);
     }
 
     private void pickUp()
@@ -101,6 +104,5 @@ public class PlayerController : MonoBehaviour
         com.Add(Input.GetKey(KeyCode.Z));
         return com;
     }
-    
-
+  
 }
