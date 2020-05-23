@@ -55,8 +55,14 @@ public class PlayerController : MonoBehaviour
             //use
             if (commands[7])
             {
-                if (holding) c.addOnTop(hold);
-                else c.pickUp(gameObject);
+                if (holding)
+                {
+                    if (c.addOnTop(hold)) holding = false;
+                }
+                else
+                {
+                    if (c.pickUp(gameObject)) holding = true;
+                }
             }
         }
         Vector3 a = transform.position + new Vector3(xValue,yValue);

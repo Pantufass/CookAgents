@@ -10,7 +10,7 @@ public class Counter : MonoBehaviour
     public bool addOnTop(GameObject o)
     {
         if (hasItem) return false;
-        o.transform.position = this.transform.position;
+        o.transform.position = this.transform.position + new Vector3(0, 0, -1);
         onTop = o.GetComponent<Item>();
         hasItem = true;
         return true;
@@ -19,7 +19,7 @@ public class Counter : MonoBehaviour
     public bool addOnTop(Item o)
     {
         if (hasItem) return false;
-        o.gameObject.transform.position = this.transform.position;
+        o.gameObject.transform.position = this.transform.position + new Vector3(0,0,-1);
         o.transform.parent = null;
         onTop = o;
         hasItem = true;

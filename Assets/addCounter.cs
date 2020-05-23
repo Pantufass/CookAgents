@@ -10,6 +10,7 @@ public class addCounter : MonoBehaviour
         {
             t.gameObject.AddComponent<BoxCollider2D>();
             t.gameObject.AddComponent<Counter>();
+            t.position = new Vector3(t.position.x,t.position.y,0);
         }
     }
 }

@@ -10,6 +10,7 @@ public class addCollider : MonoBehaviour
         foreach(Transform t in transform)
         {
             t.gameObject.AddComponent<BoxCollider2D>();
+            t.position = new Vector3(t.position.x, t.position.y, 0);
         }
     }
 }
