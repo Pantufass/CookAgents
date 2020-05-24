@@ -13,9 +13,10 @@ public class Spawner : Counter
         return  b && base.pickUp(player) ;
     }
 
-    public new bool pickUp(GameObject player)
+    public override bool pickUp(GameObject player)
     {
         return use(player);
     }
+
 
 }

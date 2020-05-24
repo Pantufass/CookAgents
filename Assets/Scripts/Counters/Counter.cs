@@ -7,7 +7,7 @@ public class Counter : MonoBehaviour
     public Item onTop;
     public bool hasItem = false;
 
-    public bool addOnTop(GameObject o)
+    public virtual bool addOnTop(GameObject o)
     {
         Recipient r = onTop as Recipient;
         if (r != null)
@@ -23,7 +23,7 @@ public class Counter : MonoBehaviour
         return true;
     }
 
-    public bool addOnTop(Item o)
+    public virtual bool addOnTop(Item o)
     {
         Recipient r = onTop as Recipient;
         if (r != null)
@@ -45,7 +45,7 @@ public class Counter : MonoBehaviour
 
     public virtual bool use(GameObject player) { return false; }
 
-    public bool pickUp(GameObject player)
+    public virtual bool pickUp(GameObject player)
     {
         if (!hasItem) return false;
         player.GetComponent<PlayerController>().holdItem(onTop);

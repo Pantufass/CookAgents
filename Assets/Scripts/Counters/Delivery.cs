@@ -12,9 +12,9 @@ public class Delivery : Counter
         r = GameObject.FindGameObjectWithTag("Return").GetComponent<Return>();
         fr = GetComponent<FoodRequests>();
     }
-    public new bool addOnTop(Item i)
+    public override bool addOnTop(Item i)
     {
-            Plate p = i as Plate;
+        Plate p = i as Plate;
         if (p != null)
         {
             fr.clearRequest(p.s);

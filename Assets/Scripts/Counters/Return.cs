@@ -13,6 +13,10 @@ public class Return : Counter
     public void sendPlate(Plate p)
     {
         p.Empty();
-        base.addOnTop(p);
+        p.gameObject.transform.position = this.transform.position + new Vector3(0, 0, -1);
+        p.transform.parent = null;
+        onTop = p;
+        hasItem = true;
+        hasItem = true;
     }
 }

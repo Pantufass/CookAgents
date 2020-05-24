@@ -15,15 +15,17 @@ public class Plate : Recipient
     public Sprite Osoup;
     public Sprite fullSalad;
 
+    private Sprite empty;
 
     public Soup soup;
-    public Food spot1;
-    public Food spot2;
+    public bool spot1;
 
     private void Start()
     {
+        spot1 = false;
         s = State.empty;
         full = false;
+        empty = GetComponent<SpriteRenderer>().sprite;
     }
 
     public override bool addFood(GameObject f)
@@ -50,30 +52,32 @@ public class Plate : Recipient
                 {
                     if (food.t == Item.type.lettuce && s != State.lettuce && food.cut)
                     {
-                        if (spot1 == null)
+                        if (!spot1)
                         {
                             GetComponent<SpriteRenderer>().sprite = wLet;
-                            spot1 = food;
+                            s = State.lettuce;
+                            spot1 = true;
                         }
                         else
                         {
                             GetComponent<SpriteRenderer>().sprite = fullSalad;
-                            spot2 = food;
+                            s = State.salad;
                             full = true;
                         }
                         return true;
                     }
                     else if (food.t == Item.type.tomato && s != State.tomato && food.cut)
                     {
-                        if (spot1 == null)
+                        if (!spot1)
                         {
                             GetComponent<SpriteRenderer>().sprite = wTom;
-                            spot1 = food;
+                            s = State.tomato;
+                            spot1 = true;
                         }
                         else
                         {
                             GetComponent<SpriteRenderer>().sprite = fullSalad;
-                            spot2 = food;
+                            s = State.salad;
                             full = true;
                         }
                         return true;
@@ -111,10 +115,10 @@ public class Plate : Recipient
 
     public void Empty()
     {
-        spot1 = null;
-        spot2 = null;
+        spot1 = false;
         s = State.empty;
         full = false;
+        GetComponent<SpriteRenderer>().sprite = empty;
     }
     
 }

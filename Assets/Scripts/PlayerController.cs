@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     private bool holding = false;
     private bool triggered = false;
 
-    private Counter c = null;
+    public Counter c = null;
 
     public PlayerController(GameObject agent)
     {
