@@ -13,7 +13,7 @@ public class Stove : Counter
             if (p.soup.canBoil())
             {
                 Debug.Log("IENF#WIFJMokmoEWNFINMFFWOEIFNM");
-                p.soup.Boiled();
+                p.Boiled();
                 return true;
             }
         }
