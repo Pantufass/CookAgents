@@ -5,9 +5,51 @@ using UnityEngine;
 public class PlayerMap
 {
 
+    private bool DEBUG = true;
+
+    private readonly int maxWaitTime = 5;
+
     private List<GameObject> otherPlayers = new List<GameObject>();
 
-    private List<Vector3> positions;
+    public GameObject ground;
+
+    private List<Vector3> positions = new List<Vector3>();
+
+    private List<Vector3> intersections = new List<Vector3>();
+
+    public PlayerMap(GameObject ground)
+    {
+        this.ground = ground;
+        foreach (Transform t in ground.transform)
+        {
+            positions.Add(new Vector3(t.position.x, t.position.y, -1));
+        }
+
+        foreach(Vector3 v in positions)
+        {
+            List<Vector3> temp = new List<Vector3>();
+            foreach(Vector3 t in positions)
+            {
+                if (!v.Equals(t))
+                {
+                    if(AdjacentPositions(v, t))
+                    {
+                        temp.Add(t);
+                    }
+                }
+            }
+            if(temp.Count == 3)
+            {
+                foreach(Vector3 h in temp)
+                {
+                    if (!intersections.Contains(h))
+                    {
+                        intersections.Add(h);
+                    }
+                } 
+            }
+        }
+    }
 
 
     public List<List<Vector3>> FindPossiblePaths(Vector3 start, Vector3 goal)
@@ -18,7 +60,7 @@ public class PlayerMap
 
         foreach(Vector3 w in walkablePositions)
         {
-            List<List<Vector3>> lp = this.FindPaths(start, w, new List<Vector3>());
+            List<List<Vector3>> lp = this.FindPaths(start, w, new List<Vector3>(), 5);
 
             foreach(List<Vector3> p in lp)
             {
@@ -31,7 +73,7 @@ public class PlayerMap
 
 
 
-    private List<List<Vector3>> FindPaths(Vector3 start, Vector3 goal, List<Vector3> path)
+    private List<List<Vector3>> FindPaths(Vector3 start, Vector3 goal, List<Vector3> path, int wait)
     {
 
         if (start.Equals(goal))
@@ -47,19 +89,38 @@ public class PlayerMap
         {
             if(AdjacentPositions(start, v)) //Adjacent square he can walk
             {
-                if(path.Contains(v)){ // path where it is coming from
-
-                    return new List<List<Vector3>>();  //returns empty because its not valid to turn back 
-
-                }
-                else        //new path
+                int ocurrences = OcurrencesInPath(path, v);
+                if(ocurrences == 0)        // path where it is coming from
                 {
+                    int newWaitTime = 5;
+                    if (intersections.Contains(v)) { newWaitTime = 0; }
                     List<Vector3> pathCopy = new List<Vector3>(path);
                     pathCopy.Add(start);
-                    List<List<Vector3>> pathsReturned = FindPaths(v, goal, pathCopy);
+                    List<List<Vector3>> pathsReturned = FindPaths(v, goal, pathCopy, newWaitTime);
                     foreach(List<Vector3> p in pathsReturned)
                     {
                         possiblePaths.Add(p);
+                    }
+                }
+                //take this out if dont want them to wait in intersections
+                else if(ocurrences == 1 && intersections.Contains(start))   //means you just left an intersection and only passed in the intersection once
+                {
+                    List<Vector3> pathCopy = new List<Vector3>(path);
+                    pathCopy.Add(start);
+                    List<List<Vector3>> pathsReturned = FindPaths(v, goal, pathCopy, 0);
+                    foreach (List<Vector3> p in pathsReturned)
+                    {
+                        possiblePaths.Add(p);
+                    }
+                    if(wait > 0)
+                    {
+                        pathCopy = new List<Vector3>(path);
+                        pathCopy.Add(start);
+                        pathsReturned = FindPaths(start, goal, pathCopy, wait - 1);
+                        foreach (List<Vector3> p in pathsReturned)
+                        {
+                            possiblePaths.Add(p);
+                        }
                     }
                 }
             }
@@ -92,6 +153,19 @@ public class PlayerMap
             }
             return walkablePositions;
         }
+    }
+
+    private int OcurrencesInPath(List<Vector3> path, Vector3 v)
+    {
+        int ocurrences = 0;
+        foreach(Vector3 position in path)
+        {
+            if (position.Equals(v))
+            {
+                ocurrences++;
+            }
+        }
+        return ocurrences;
     }
 
     private bool AdjacentPositions(Vector3 pos1, Vector3 pos2)

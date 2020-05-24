@@ -8,15 +8,20 @@ public class Agent : MonoBehaviour
 
     private List<GameObject> otherPlayers = new List<GameObject>();
 
-    private List<List<Task>> iterationTasks = new List<List<Task>>();
+    private List<AgentTasksInfo> iterationTasks = new List<AgentTasksInfo>();
 
     private PlayerController controller;
 
-    private PlayerMap map = new PlayerMap();
+    public GameObject ground;
+
+    private PlayerMap map;
+
+    private Task currentTask = null;
+
     // Start is called before the first frame update
     void Start()
     {
-        controller = new PlayerController(this.gameObject);
+        controller = this.gameObject.GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
@@ -25,6 +30,20 @@ public class Agent : MonoBehaviour
         Perceive();
         Decide();
         Act();
+    }
+
+    private void FixedUpdate()
+    {
+        List<bool> com = new List<bool>();
+        com.Add(Input.GetKey(KeyCode.A));
+        com.Add(Input.GetKey(KeyCode.D));
+        com.Add(Input.GetKey(KeyCode.W));
+        com.Add(Input.GetKey(KeyCode.S));
+        com.Add(Input.GetKey(KeyCode.Q));
+        com.Add(Input.GetKey(KeyCode.E));
+        com.Add(Input.GetKey(KeyCode.X));
+        com.Add(Input.GetKey(KeyCode.Z));
+        controller.Act(com);
     }
 
     private void Perceive()
@@ -64,13 +83,13 @@ public class Agent : MonoBehaviour
                 Agent a = p.GetComponent<Agent>();
                 if(a.GetId() == highestId)
                 {
-                    a.ReceiveAgentTasks(possibleTasks);
+                    a.ReceiveAgentTasks(new AgentTasksInfo(this, possibleTasks, currentTask));
                 }
             }
         }
         else
         {
-            iterationTasks.Add(possibleTasks);
+            iterationTasks.Add(new AgentTasksInfo(this, possibleTasks, currentTask));
         }
 
     }
@@ -101,7 +120,7 @@ public class Agent : MonoBehaviour
 
 
 
-    private void ReceiveAgentTasks(List<Task> tasks)
+    private void ReceiveAgentTasks(AgentTasksInfo tasks)
     {
         iterationTasks.Add(tasks);
         if(iterationTasks.Count == otherPlayers.Count + 1)
@@ -110,7 +129,11 @@ public class Agent : MonoBehaviour
             Decide();
         }
     }
-
+    public void StartMap()
+    {
+        ground = GameObject.FindGameObjectWithTag("Ground");
+        map = new PlayerMap(ground);
+    }
     public void AddOtherPlayer(GameObject player)
     {
         otherPlayers.Add(player);

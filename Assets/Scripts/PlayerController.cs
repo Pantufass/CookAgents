@@ -6,9 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     public GameObject ground;
 
-    private GameObject agent;
-
-    private List<Vector3> positions;
+    private List<Vector3> positions = new List<Vector3>();
 
     private Item hold;
     private Vector3 front;
@@ -20,16 +18,9 @@ public class PlayerController : MonoBehaviour
 
     public Counter c = null;
 
-    public PlayerController(GameObject agent)
-    {
-        this.agent = agent;
-    }
-
     private void Start()
     {
         front = new Vector3(0,1,0);
-
-        positions = new List<Vector3>();
 
         ground = GameObject.FindGameObjectWithTag("Ground");
 
@@ -44,10 +35,9 @@ public class PlayerController : MonoBehaviour
         col.size = new Vector2(0.8f, 0.8f);
     }
 
-    void FixedUpdate()
-    {
-        List<bool> commands = getInput();
 
+    public void Act(List<bool> commands)
+    {
         int xValue = 0, yValue = 0, up = 0;
 
 
@@ -65,7 +55,7 @@ public class PlayerController : MonoBehaviour
         //rotate right
         if (commands[5]) up -= 1;
 
-        if(c != null && triggered)
+        if (c != null && triggered)
         {
             //pick up
             if (commands[6])
@@ -93,13 +83,13 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        Vector3 a = transform.position + new Vector3(xValue,yValue);
+        Vector3 a = transform.position + new Vector3(xValue, yValue);
         if (positions.Contains(a))
         {
             front += new Vector3(xValue, yValue);
             transform.position = a;
         }
-        transform.Rotate(up*new Vector3(0,0,1),90f);
+        transform.Rotate(up * new Vector3(0, 0, 1), 90f);
         front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
     }
 
@@ -130,18 +120,4 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
-    private List<bool> getInput()
-    {
-        List<bool> com = new List<bool>();
-        com.Add(Input.GetKey(KeyCode.A));
-        com.Add(Input.GetKey(KeyCode.D));
-        com.Add(Input.GetKey(KeyCode.W));
-        com.Add(Input.GetKey(KeyCode.S));
-        com.Add(Input.GetKey(KeyCode.Q));
-        com.Add(Input.GetKey(KeyCode.E));
-        com.Add(Input.GetKey(KeyCode.X));
-        com.Add(Input.GetKey(KeyCode.Z));
-        return com;
-    }
-  
 }

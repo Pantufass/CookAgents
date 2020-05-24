@@ -58,6 +58,7 @@ public class PlayerManager : MonoBehaviour
 
             players.Add(player);
             player.GetComponent<Agent>().SetId(i + 1);
+            player.GetComponent<Agent>().StartMap();
         }
         for(int j = 0; j < players.Count; j++)
         {
