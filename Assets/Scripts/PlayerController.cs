@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        front = new Vector3(0,1.05f,0);
+        front = new Vector3(0,1,0);
 
         positions = new List<Vector3>();
 
@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
         col.size = new Vector2(0.8f, 0.8f);
     }
 
-    void LateUpdate()
+    void FixedUpdate()
     {
         List<bool> commands = getInput();
 
@@ -108,13 +108,12 @@ public class PlayerController : MonoBehaviour
     {
         triggered = true;
         c = collision.gameObject.GetComponent<Counter>();
+        Debug.Log("WIEJFNMEWFEFWEFWE");
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        triggered = false;
-        c = null;
-    }
+   
+
+ 
 
 
     public bool holdItem(Item i)

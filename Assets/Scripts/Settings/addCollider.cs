@@ -9,7 +9,9 @@ public class addCollider : MonoBehaviour
     {
         foreach(Transform t in transform)
         {
-            t.gameObject.AddComponent<BoxCollider2D>();
+            BoxCollider2D b= t.gameObject.AddComponent<BoxCollider2D>();
+            b.size = new Vector2(0.5f, 0.5f);
+            //b.offset = new Vector2(0.25f, 0.25f);
             t.position = new Vector3(t.position.x, t.position.y, 0);
         }
     }
