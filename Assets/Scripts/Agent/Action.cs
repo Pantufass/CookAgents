@@ -4,26 +4,23 @@ using UnityEngine;
 
 public class Action
 {
+
+    private string actionType;
     private List<Vector3> goal;
 
     //private List<Vector3> secondGoal;
 
-
+    public Action(string action)
+    {
+        this.actionType = action;
+    }
 
     public List<Vector3> GetGoal()
     {
-        return goal;
+        return this.goal;
     }
-
-    // Start is called before the first frame update
-    void Start()
+    public string GetActionType()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        return this.actionType;
     }
 }

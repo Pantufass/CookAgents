@@ -21,9 +21,9 @@ public class PlayerManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        getPositions();
+        GetPositions();
 
-        spawnPlayers();
+        SpawnPlayers();
 
 
     }
@@ -34,7 +34,7 @@ public class PlayerManager : MonoBehaviour
         
     }
 
-    private void getPositions()
+    private void GetPositions()
     {
         foreach (Transform t in ground.transform)
         {
@@ -42,7 +42,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void spawnPlayers()
+    private void SpawnPlayers()
     {
         for (int i = 0; i < PLAYERNUMBER; i++)
         {
@@ -57,6 +57,17 @@ public class PlayerManager : MonoBehaviour
             GameObject player = Instantiate(playerPrefabs[i], position, Quaternion.identity);
 
             players.Add(player);
+            player.GetComponent<Agent>().SetId(i + 1);
+        }
+        for(int j = 0; j < players.Count; j++)
+        {
+            for(int h = 0; h < players.Count; h++)
+            {
+                if(j != h)
+                {
+                    players[j].GetComponent<Agent>().AddOtherPlayer(players[h]);
+                }
+            }
         }
     }
 }
