@@ -30,9 +30,9 @@ public class Plate : Recipient
     {
         if (!full)
         {
-            if(f.GetComponent<Soup>() != null && s == State.empty)
+            soup = f.GetComponent<Soup>();
+            if (soup != null && s == State.empty)
             {
-                soup = f.GetComponent<Soup>();
                 full = true;
                 if (soup.type() == Item.type.onion){
                     GetComponent<SpriteRenderer>().sprite = Osoup;
@@ -84,6 +84,30 @@ public class Plate : Recipient
         return false;
     }
 
+    public bool addSoup(Soup soup2)
+    {
+        if (!full)
+        {
+            soup = soup2;
+            if (soup != null && s == State.empty)
+            {
+                full = true;
+                if (soup.type() == Item.type.onion)
+                {
+                    GetComponent<SpriteRenderer>().sprite = Osoup;
+                    s = State.onSoup;
+                    return true;
+                }
+                else if (soup.type() == Item.type.tomato)
+                {
+                    GetComponent<SpriteRenderer>().sprite = Tsoup;
+                    s = State.tomSoup;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public void Empty()
     {

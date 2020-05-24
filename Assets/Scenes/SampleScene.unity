@@ -669,16 +669,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   t: 3
-  soup: {fileID: 0}
-  salad: []
+  s: 0
   full: 0
-  nolet: 1
-  notom: 1
   wTom: {fileID: 21300000, guid: e24f97d545cad794183839257fb4d541, type: 3}
   wLet: {fileID: 21300000, guid: 71401b88df9345c4c93ace8a6069464b, type: 3}
   Tsoup: {fileID: 21300000, guid: abf87581e9764d04a8513b66f6f4aa80, type: 3}
   Osoup: {fileID: 21300000, guid: d837b81d4ef1f0147970badcf2033983, type: 3}
   fullSalad: {fileID: 21300000, guid: b6db110fa03da8a44b04c6fc8e33ba0e, type: 3}
+  soup: {fileID: 0}
+  spot1: {fileID: 0}
+  spot2: {fileID: 0}
 --- !u!212 &277173564
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5793,7 +5793,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   t: 4
-  soup: {fileID: 0}
+  soup: {fileID: 4393349371066181441, guid: 09727ac68287dcf45bd7cf3aaeefa7c3, type: 3}
   OPan:
   - {fileID: 21300000, guid: 4edff1c378f8d5b409b6d8f5d4255910, type: 3}
   - {fileID: 21300000, guid: 08a8df84d6bf829479f02a01aa8e6a47, type: 3}
@@ -5804,6 +5804,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: a566dec307642d546ba002676c98cf10, type: 3}
   - {fileID: 21300000, guid: a3bce0896f3ba414dbdabc913f0563b0, type: 3}
   - {fileID: 21300000, guid: 00d98abb56afd944e9ae4511c23e9047, type: 3}
+  empty: {fileID: 0}
 --- !u!212 &1286820775
 SpriteRenderer:
   m_ObjectHideFlags: 0

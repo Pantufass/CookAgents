@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 front;
     private BoxCollider2D col;
 
+    private bool pan = false;
     private bool holding = false;
     private bool triggered = false;
     public Counter c = null;
@@ -63,7 +64,15 @@ public class PlayerController : MonoBehaviour
             //use
             if (commands[7])
             {
-                if (holding)
+                if (pan)
+                {
+                    if (c.addPan(hold as Pan))
+                    {
+                        holding = false;
+                        pan = false;
+                    }
+                }
+                else if (holding)
                 {
                     if (c.addOnTop(hold)) holding = false;
                 }
@@ -101,6 +110,9 @@ public class PlayerController : MonoBehaviour
     {
         if (!holding)
         {
+            Pan p = i as Pan;
+            pan = p != null;
+
             hold = i;
             holding = true;
             return true;
