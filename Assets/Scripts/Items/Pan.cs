@@ -4,22 +4,28 @@ using UnityEngine;
 
 public class Pan : Recipient
 {
-    public Soup soup = new Soup();
+    public Soup soup;
 
     public List<Sprite> OPan;
     public List<Sprite> TPan;
 
     private SpriteRenderer sp;
 
+    public Sprite empty;
+
     private void Start()
     {
-        soup = new Soup();
+        GameObject o = Instantiate(soup.gameObject);
+        soup = o.GetComponent<Soup>();
         sp = GetComponent<SpriteRenderer>();
+        empty = sp.sprite;
     }
 
     public void Empty()
     {
-        soup = new Soup();
+        GameObject o = Instantiate(soup.gameObject);
+        soup = o.GetComponent<Soup>();
+        sp.sprite = empty;
     }
 
     public override bool addFood(GameObject o)
@@ -49,4 +55,5 @@ public class Pan : Recipient
         else if (soup.type() == type.tomato) sp.sprite = TPan[soup.numItems()];
         soup.Boiled();
     }
+
 }

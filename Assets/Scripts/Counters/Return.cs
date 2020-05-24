@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class Return : Counter
 {
-    // Start is called before the first frame update
+    
     void Start()
     {
         
     }
 
+    public void sendPlate(Plate p)
+    {
+        p.Empty();
+        base.addOnTop(p);
+    }
 }

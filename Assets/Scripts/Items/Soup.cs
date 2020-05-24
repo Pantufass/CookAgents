@@ -58,4 +58,9 @@ public class Soup : MonoBehaviour, PlatableFood
     {
         done = true;
     }
+
+    public bool isDone()
+    {
+        return done;
+    }
 }

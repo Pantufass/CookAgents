@@ -57,4 +57,20 @@ public class Counter : MonoBehaviour
 
     }
 
+    public bool addPan(Pan pan)
+    {
+        Plate plate = onTop as Plate;
+        if (plate != null && pan != null)
+        {
+            if (plate.addSoup(pan.soup)) pan.Empty();
+            return false;
+        }
+        if (hasItem) return false;
+        pan.gameObject.transform.position = this.transform.position + new Vector3(0, 0, -1);
+        pan.transform.parent = null;
+        onTop = pan;
+        hasItem = true;
+        return true;
+    }
+
 }
