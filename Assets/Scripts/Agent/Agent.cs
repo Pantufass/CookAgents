@@ -12,10 +12,15 @@ public class Agent : MonoBehaviour
 
     private PlayerController controller;
 
+    private List<Request> requestList;
+    private Requirement currentObjective;
+    private Task currentTask;
+    
     private PlayerMap map = new PlayerMap();
     // Start is called before the first frame update
     void Start()
     {
+        requestList = new List<Request>();
         controller = new PlayerController(this.gameObject);
     }
 
@@ -27,6 +32,7 @@ public class Agent : MonoBehaviour
         Act();
     }
 
+    //perceive current objective
     private void Perceive()
     {
         Request request = GetMostRecentRequest();
@@ -75,11 +81,13 @@ public class Agent : MonoBehaviour
 
     }
 
+    //decide based on objective
     private void Decide()
     {
 
     }
 
+    //act based on task
     private void Act()
     {
 
