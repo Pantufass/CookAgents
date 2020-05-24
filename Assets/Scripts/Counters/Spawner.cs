@@ -15,6 +15,7 @@ public class Spawner : Counter
 
     public override bool pickUp(GameObject player)
     {
+        if (onTop != null) return base.pickUp(player);
         return use(player);
     }
 
