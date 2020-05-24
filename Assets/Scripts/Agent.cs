@@ -28,26 +28,30 @@ public class Agent : MonoBehaviour
         Request request = GetMostRecentRequest(); 
         List<Action> actions = GetPossibleActionsForRequest(request);
         List<Task> possibleTasks = new List<Task>();
-        foreach(Action a in actions)
+        foreach (Action a in actions)
         {
             List<Vector3> goal = a.GetGoal();
 
             List<List<Vector3>> allPossiblePaths = new List<List<Vector3>>();
 
-            foreach(Vector3 v in goal)
+            foreach (Vector3 v in goal)
             {
                 List<List<Vector3>> possiblePaths = map.FindPossiblePaths(this.transform.position, v);
 
-                foreach(List<Vector3> path in possiblePaths)
+                foreach (List<Vector3> path in possiblePaths)
                 {
                     allPossiblePaths.Add(path);
                 }
             }
 
             Task possibleTask = new Task(a, allPossiblePaths);
-
             possibleTasks.Add(possibleTask);
+
+
+
         }
+
+
 
 
     }
