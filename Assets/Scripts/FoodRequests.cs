@@ -44,7 +44,9 @@ public class FoodRequests : MonoBehaviour
 
     private void createRequest()
     {
-
+        System.Array values = System.Enum.GetValues(typeof(Plate.State));
+        Plate.State random = (Plate.State)values.GetValue(r.Next(values.Length));
+        requests.Add(random);
     }
 
     public Sprite getRecipe(int i)
