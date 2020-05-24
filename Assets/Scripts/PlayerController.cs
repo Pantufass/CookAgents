@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject ground; 
+    public GameObject ground;
 
-    private List<Vector3> positions = new List<Vector3>();
+    private GameObject agent;
+
+    private List<Vector3> positions;
 
     private Item hold;
     private Vector3 front;
@@ -15,10 +17,19 @@ public class PlayerController : MonoBehaviour
     private bool pan = false;
     private bool holding = false;
     private bool triggered = false;
-    public Counter c = null;
+
+    private Counter c = null;
+
+    public PlayerController(GameObject agent)
+    {
+        this.agent = agent;
+    }
+
     private void Start()
     {
-        front = new Vector3(0,1.05f,0);
+        front = this.transform.position;
+
+        positions = new List<Vector3>();
 
         ground = GameObject.FindGameObjectWithTag("Ground");
 
@@ -33,7 +44,7 @@ public class PlayerController : MonoBehaviour
         col.size = new Vector2(0.8f, 0.8f);
     }
 
-    void Update()
+    void LateUpdate()
     {
         List<bool> commands = getInput();
 
