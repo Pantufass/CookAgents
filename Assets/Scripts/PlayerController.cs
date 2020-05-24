@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        front = this.transform.position;
+        front = new Vector3(0,1.05f,0);
 
         positions = new List<Vector3>();
 
