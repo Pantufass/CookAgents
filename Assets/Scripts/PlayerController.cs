@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
 
     public Counter c = null;
 
+    private FoodRequests fr;
+
     public PlayerController(GameObject agent)
     {
         this.agent = agent;
@@ -39,12 +41,14 @@ public class PlayerController : MonoBehaviour
         }
         col = gameObject.AddComponent<BoxCollider2D>();
         col.offset = front;
-        col.isTrigger = true;
+        //col.isTrigger = true;
         col.enabled = true;
         col.size = new Vector2(0.8f, 0.8f);
+
+        fr = FindObjectOfType<FoodRequests>();
     }
 
-    void FixedUpdate()
+    void LateUpdate()
     {
         List<bool> commands = getInput();
 
@@ -108,13 +112,26 @@ public class PlayerController : MonoBehaviour
     {
         triggered = true;
         c = collision.gameObject.GetComponent<Counter>();
-        Debug.Log("WIEJFNMEWFEFWEFWE");
+        Debug.Log(c);
     }
 
-   
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        triggered = false;
+        c = null;
+    }
 
- 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
 
+        triggered = true;
+        c = collision.gameObject.GetComponent<Counter>();
+    }
+
+    private Plate.State lastRequest()
+    {
+        return fr.lastRequest();
+    }
 
     public bool holdItem(Item i)
     {

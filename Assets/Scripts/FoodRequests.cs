@@ -80,4 +80,9 @@ public class FoodRequests : MonoBehaviour
         }
         return false;
     }
+
+    public Plate.State lastRequest()
+    {
+        return requests[0];
+    }
 }
