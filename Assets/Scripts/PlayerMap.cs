@@ -5,9 +5,10 @@ using UnityEngine;
 public class PlayerMap
 {
 
-    private List<GameObject> otherPlayers;
+    private List<GameObject> otherPlayers = new List<GameObject>();
 
     private List<Vector3> positions;
+
 
     public List<List<Vector3>> FindPossiblePaths(Vector3 start, Vector3 goal)
     {
@@ -107,5 +108,10 @@ public class PlayerMap
         //TODO
         return new Vector3();
 
+    }
+
+    public void AddOtherPlayer(GameObject player)
+    {
+        otherPlayers.Add(player);
     }
 }   

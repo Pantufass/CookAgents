@@ -18,4 +18,19 @@ public class Task
         this.possiblePaths = possiblePaths;
     }
 
+    public Action GetAction()
+    {
+        return this.action;
+    }
+
+    public List<List<Vector3>> GetPossiblePaths()
+    {
+        return this.possiblePaths;
+    }
+
+    public List<Vector3> GetChosenPath()
+    {
+        return this.chosenPath;
+    }
+
 }

@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class Agent : MonoBehaviour
 {
+    private int id;
+
+    private List<GameObject> otherPlayers = new List<GameObject>();
+
+    private List<List<Task>> iterationTasks = new List<List<Task>>();
 
     private PlayerController controller;
 
-    private PlayerMap map;
+    private PlayerMap map = new PlayerMap();
     // Start is called before the first frame update
     void Start()
     {
         controller = new PlayerController(this.gameObject);
-        map = new PlayerMap(); 
     }
 
     // Update is called once per frame
@@ -25,7 +29,7 @@ public class Agent : MonoBehaviour
 
     private void Perceive()
     {
-        Request request = GetMostRecentRequest(); 
+        Request request = GetMostRecentRequest();
         List<Action> actions = GetPossibleActionsForRequest(request);
         List<Task> possibleTasks = new List<Task>();
         foreach (Action a in actions)
@@ -51,8 +55,23 @@ public class Agent : MonoBehaviour
 
         }
 
+        int highestId = otherPlayers.Count + 1;
 
-
+        if (id != highestId)
+        {
+            foreach(GameObject p in otherPlayers)
+            {
+                Agent a = p.GetComponent<Agent>();
+                if(a.GetId() == highestId)
+                {
+                    a.ReceiveAgentTasks(possibleTasks);
+                }
+            }
+        }
+        else
+        {
+            iterationTasks.Add(possibleTasks);
+        }
 
     }
 
@@ -76,6 +95,35 @@ public class Agent : MonoBehaviour
     private List<Action> GetPossibleActionsForRequest(Request request)
     {
         //TODO
-        return null; 
+        return new List<Action>(); 
+    }
+
+
+
+
+    private void ReceiveAgentTasks(List<Task> tasks)
+    {
+        iterationTasks.Add(tasks);
+        if(iterationTasks.Count == otherPlayers.Count + 1)
+        {
+            Debug.Log("lets gooo");
+            Decide();
+        }
+    }
+
+    public void AddOtherPlayer(GameObject player)
+    {
+        otherPlayers.Add(player);
+        map.AddOtherPlayer(player);
+    }
+
+    public void SetId(int id)
+    {
+        this.id = id;
+    }
+
+    public int GetId()
+    {
+        return this.id;
     }
 }
