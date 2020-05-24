@@ -9,6 +9,7 @@ public class Settings : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = speed;
+        Physics2D.gravity = Vector2.zero;
     }
 
 }

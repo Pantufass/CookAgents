@@ -108,16 +108,14 @@ public class PlayerController : MonoBehaviour
     {
         triggered = true;
         c = collision.gameObject.GetComponent<Counter>();
-        Debug.Log("ENTER");
-        
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        Debug.Log(c.transform.position);
         triggered = false;
         c = null;
     }
+
 
     public bool holdItem(Item i)
     {

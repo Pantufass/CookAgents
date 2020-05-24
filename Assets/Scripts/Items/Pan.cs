@@ -16,6 +16,7 @@ public class Pan : Recipient
     private void Start()
     {
         GameObject o = Instantiate(soup.gameObject);
+        o.transform.parent = transform;
         soup = o.GetComponent<Soup>();
         sp = GetComponent<SpriteRenderer>();
         empty = sp.sprite;
