@@ -37,8 +37,7 @@ public class FoodRequirement : Requirement
         cut = true;
         FoodRequirement r = new FoodRequirement(foodT);
         prev = r;
-        Requirement r1 = new Requirement();
-        r.t = type.cut;
+        Requirement r1 = new Requirement(type.cut);
         cutted = r1;
         
     }

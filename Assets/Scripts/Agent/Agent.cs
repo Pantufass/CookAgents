@@ -61,9 +61,16 @@ public class Agent : MonoBehaviour
         //make requests if it is the closest one
         if(closest(delivery.transform.position) == gameObject)
         {
-            createRequest(r);
+            addObjective(r);
         }
          
+    }
+
+    void addObjective(Plate.State r)
+    {
+        Objective o = new Objective(r);
+        o.target = delivery.transform.position;
+        requestList.Add(o);
     }
 
     void createRequest(Plate.State r)
@@ -99,6 +106,7 @@ public class Agent : MonoBehaviour
 
     void newRequest(Requirement r)
     {
+        if (currentObjective != null) return;
         GameObject closest = gameObject;
         float minDist = 10000;
         foreach (Vector3 p in r.pos)
@@ -127,12 +135,12 @@ public class Agent : MonoBehaviour
 
         if (closest == gameObject)
         {
-            passRequests(r);
+            currentObjective = r;
         }
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         Perceive();
         Decide();
@@ -142,49 +150,20 @@ public class Agent : MonoBehaviour
     //perceive current objective
     private void Perceive()
     {
-        Request request = GetMostRecentRequest();
-        List<Action> actions = GetPossibleActionsForRequest(request);
-        List<Task> possibleTasks = new List<Task>();
-        foreach (Action a in actions)
+        if(currentObjective == null && requestList[0] != null)
         {
-            List<Vector3> goal = a.GetGoal();
+            //update new objective
+            currentObjective = requestList[0];
 
-            List<List<Vector3>> allPossiblePaths = new List<List<Vector3>>();
-
-            foreach (Vector3 v in goal)
-            {
-                List<List<Vector3>> possiblePaths = map.FindPossiblePaths(this.transform.position, v);
-
-                foreach (List<Vector3> path in possiblePaths)
-                {
-                    allPossiblePaths.Add(path);
-                }
-            }
-
-            Task possibleTask = new Task(a, allPossiblePaths);
-            possibleTasks.Add(possibleTask);
-
-
-
-        }
-
-        int highestId = otherPlayers.Count + 1;
-
-        if (id != highestId)
-        {
-            foreach(GameObject p in otherPlayers)
-            {
-                Agent a = p.GetComponent<Agent>();
-                if(a.GetId() == highestId)
-                {
-                    a.ReceiveAgentTasks(possibleTasks);
-                }
-            }
+            //throw request
+            Objective o = currentObjective as Objective;
+            if(o != null) GameEvents.current.RequestEnter(o.nextReq());
         }
         else
         {
-            iterationTasks.Add(possibleTasks);
+
         }
+
 
     }
 

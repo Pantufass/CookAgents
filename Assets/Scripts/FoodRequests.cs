@@ -59,7 +59,7 @@ public class FoodRequests : MonoBehaviour
     private void addRecipe(Plate.State r)
     {
         requests.Add(r);
-
+        ar.changeThem(); 
         //call event, new recipe
         GameEvents.current.RecipeEnter(r);
     }

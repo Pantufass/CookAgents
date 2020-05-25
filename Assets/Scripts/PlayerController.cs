@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
 
     private FoodRequests fr;
 
+    private PlayerController[] players;
+
     public PlayerController(GameObject agent)
     {
         this.agent = agent;
@@ -46,6 +48,8 @@ public class PlayerController : MonoBehaviour
         col.size = new Vector2(0.8f, 0.8f);
 
         fr = FindObjectOfType<FoodRequests>();
+
+        players = FindObjectsOfType<PlayerController>();
     }
 
     void LateUpdate()
@@ -98,7 +102,7 @@ public class PlayerController : MonoBehaviour
             }
         }
         Vector3 a = transform.position + new Vector3(xValue,yValue);
-        if (positions.Contains(a))
+        if (positions.Contains(a) && canMove(a))
         {
             front += new Vector3(xValue, yValue);
             transform.position = a;
@@ -107,6 +111,14 @@ public class PlayerController : MonoBehaviour
         front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
     }
 
+    bool canMove(Vector3 a)
+    {
+        foreach(PlayerController p in players)
+        {
+            if (p.transform.position == a) return false;
+        }
+        return true;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

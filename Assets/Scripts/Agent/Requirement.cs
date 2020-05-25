@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Requirement
 {
-    public enum type {boil, cut, pan, plate, food, objective, deliver}
+    public enum type {boil, cut, pan, plate, food, objective, deliver, dish}
 
     public type t;
 

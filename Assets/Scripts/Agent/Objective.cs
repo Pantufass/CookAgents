@@ -35,6 +35,15 @@ public class Objective : Requirement
         requirements = new List<Requirement>();
     }
 
+    public Requirement nextReq()
+    {
+        foreach (Requirement r in requirements)
+        {
+            if (!r.sucess()) return r;
+        }
+        return null;
+    }
+
     public Objective(Plate.State r)
     {
         requirements = new List<Requirement>();
@@ -74,24 +83,28 @@ public class Objective : Requirement
         return b;
     }
 
-    public void addReq(Requirement r)
-    {
-        requirements.Add(r);
-    }
 
     void objOnionSoup()
     {
-        requirements.Add(new Requirement(type.plate));
+        List<Requirement> fr = new List<Requirement>();
+        fr.Add(addCut(FoodRequirement.foodType.onion));
+        fr.Add(addCut(FoodRequirement.foodType.onion));
+        fr.Add(addCut(FoodRequirement.foodType.onion));
 
-        requirements.Add(new Requirement(type.pan));
+        //needs a pan and a list of food
+        DishRequirement dr = new DishRequirement(fr, new Requirement(type.pan));
+        List<Requirement> panDish = new List<Requirement>();
+        panDish.Add(dr);
 
-
-        requirements.Add(addCut(FoodRequirement.foodType.onion));
-        requirements.Add(addCut(FoodRequirement.foodType.onion));
-        requirements.Add(addCut(FoodRequirement.foodType.onion));
-
+        //soup dish requirement
+        requirements.Add(dr);
+        //boil the soup
         requirements.Add(new Requirement(type.boil));
 
+        //plate the soup
+        requirements.Add(new DishRequirement(panDish, new Requirement(type.plate)));
+
+        //deliver it
         requirements.Add(new Requirement(type.deliver));
 
     }
@@ -105,40 +118,61 @@ public class Objective : Requirement
 
     void objSalad()
     {
-        requirements.Add(new Requirement(type.plate));
+        List<Requirement> fr = new List<Requirement>();
+        fr.Add(addCut(FoodRequirement.foodType.tomato));
+        fr.Add(addCut(FoodRequirement.foodType.lettuce));
 
-        requirements.Add(addCut(FoodRequirement.foodType.tomato));
-        requirements.Add(addCut(FoodRequirement.foodType.lettuce));
+        //plate the salad
+        requirements.Add(new DishRequirement(fr, new Requirement(type.plate)));
 
+        //deliver it
         requirements.Add(new Requirement(type.deliver));
     }
 
     void objTomatoSoup()
     {
-        requirements.Add(new Requirement(type.plate));
+        List<Requirement> fr = new List<Requirement>();
+        fr.Add(addCut(FoodRequirement.foodType.tomato));
+        fr.Add(addCut(FoodRequirement.foodType.tomato));
+        fr.Add(addCut(FoodRequirement.foodType.tomato));
 
-        requirements.Add(new Requirement(type.pan));
+        //needs a pan and a list of food
+        DishRequirement dr = new DishRequirement(fr, new Requirement(type.pan));
+        List<Requirement> panDish = new List<Requirement>();
+        panDish.Add(dr);
 
-
-        requirements.Add(addCut(FoodRequirement.foodType.tomato));
-        requirements.Add(addCut(FoodRequirement.foodType.tomato));
-        requirements.Add(addCut(FoodRequirement.foodType.tomato));
-
+        //soup dish requirement
+        requirements.Add(dr);
+        //boil the soup
         requirements.Add(new Requirement(type.boil));
 
+        //plate the soup
+        requirements.Add(new DishRequirement(panDish, new Requirement(type.plate)));
+
+        //deliver it
         requirements.Add(new Requirement(type.deliver));
     }
 
     void objLettuce()
     {
-        requirements.Add(new Requirement(type.plate));
-        requirements.Add(addCut(FoodRequirement.foodType.lettuce));
+        List<Requirement> fr = new List<Requirement>();
+        fr.Add(addCut(FoodRequirement.foodType.lettuce));
+
+        //plate the salad
+        requirements.Add(new DishRequirement(fr, new Requirement(type.plate)));
+
+        //deliver it
         requirements.Add(new Requirement(type.deliver));
     }
     void objTomato()
     {
-        requirements.Add(new Requirement(type.plate));
-        requirements.Add(addCut(FoodRequirement.foodType.tomato));
+        List<Requirement> fr = new List<Requirement>();
+        fr.Add(addCut(FoodRequirement.foodType.tomato));
+
+        //plate the salad
+        requirements.Add(new DishRequirement(fr, new Requirement(type.plate)));
+
+        //deliver it
         requirements.Add(new Requirement(type.deliver));
     }
 
