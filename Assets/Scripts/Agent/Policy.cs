@@ -5,8 +5,8 @@ using UnityEngine;
 public class Policy
 {
 
-    private readonly int colisionPenalty = 100;
-    private readonly int concurrencyPenalty = 5;
+    private readonly int colisionPenalty = 200;
+    private readonly int concurrencyPenalty = 50;
     private readonly int bonusForProximity = 10;
     private readonly int priorityPenalty = 2;
 
@@ -50,6 +50,7 @@ public class Policy
 
     private void FormSets(List<List<Task>> allTasks, int index, List<Task> currentSet)
     {
+
         foreach(Task t in allTasks[index])
         {
             List<Task> cloneSet = new List<Task>(currentSet);

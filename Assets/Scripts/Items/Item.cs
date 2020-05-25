@@ -18,4 +18,8 @@ public class Item : MonoBehaviour
     {
 
     }
+    public type GetType()
+    {
+        return t;
+    }
 }

@@ -15,6 +15,10 @@ public class PlayerMap : MonoBehaviour
 
     public GameObject specials;
 
+    private List<List<Vector3>> crossing = new List<List<Vector3>>();
+
+    private List<Vector3> center = new List<Vector3>();
+
     private List<Vector3> positions = new List<Vector3>();
 
     private List<Vector3> intersections = new List<Vector3>();
@@ -22,6 +26,8 @@ public class PlayerMap : MonoBehaviour
     private List<Transform> stoves = new List<Transform>();
 
     private List<Vector3> onionDisp = new List<Vector3>();
+
+    private List<Vector3>tomatoDisp = new List<Vector3>();
 
     private List<Transform> cuttingBoards = new List<Transform>();
 
@@ -40,6 +46,9 @@ public class PlayerMap : MonoBehaviour
     private Transform delivery;
 
     private Vector3 plateReturn;
+
+
+    private List<AgentDecisionTask> bestTasks;
 
     void Start()
     {
@@ -68,6 +77,7 @@ public class PlayerMap : MonoBehaviour
             }
             if(temp.Count == 3)
             {
+                center.Add(v);
                 foreach(Vector3 h in temp)
                 {
                     if (!intersections.Contains(h))
@@ -88,6 +98,18 @@ public class PlayerMap : MonoBehaviour
             GameObject plate = GameObject.Find("Plate" + i);
             this.plates.Add(plate.transform);
         }
+        for(int i = 1; i < 7; i++)
+        {
+            List<Vector3> specificCrossing = new List<Vector3>();
+            foreach(Transform a in ground.transform)
+            {
+                if( a.gameObject.name.Equals("Crossing" + i))
+                {
+                    specificCrossing.Add(a.position);
+                }
+            }
+            crossing.Add(specificCrossing);
+        }
 
     }
 
@@ -103,6 +125,10 @@ public class PlayerMap : MonoBehaviour
 
                 case "OnionDisp":
                     this.onionDisp.Add(new Vector3(t.position.x, t.position.y, -1));
+                    break;
+
+                case "TomatoDisp":
+                    this.tomatoDisp.Add(new Vector3(t.position.x, t.position.y, -1));
                     break;
 
                 case "CuttingBoard":
@@ -147,8 +173,10 @@ public class PlayerMap : MonoBehaviour
 
     private List<List<Vector3>> FindPaths(Vector3 start, Vector3 goal, List<Vector3> path, int wait)
     {
+        //Debug.Log(start + "  -->  " + goal);
         if (start.Equals(goal))
         {
+            //Debug.Log("Path found");
             path.Add(start);
             List<List<Vector3>> paths = new List<List<Vector3>>();
             paths.Add(path);
@@ -158,6 +186,10 @@ public class PlayerMap : MonoBehaviour
 
         foreach(Vector3 v in positions)
         {
+            if (start.Equals(v))
+            {
+                continue;
+            }
             if(AdjacentPositions(start, v)) //Adjacent square he can walk
             {
                 int ocurrences = OcurrencesInPath(path, v);
@@ -174,7 +206,7 @@ public class PlayerMap : MonoBehaviour
                     }
                 }/*
                 //take this out if dont want them to wait in intersections
-                else if(ocurrences == 1 && intersections.Contains(start))   //means you just left an intersection and only passed in the intersection once
+                else if(ocurrences == 1 && intersections.Contains(start) && !intersections.Contains(v))   //means you just left an intersection and only passed in the intersection once
                 {
                     List<Vector3> pathCopy = new List<Vector3>(path);
                     pathCopy.Add(start);
@@ -182,7 +214,7 @@ public class PlayerMap : MonoBehaviour
                     foreach (List<Vector3> p in pathsReturned)
                     {
                         possiblePaths.Add(p);
-                    }
+                    }/*
                     if(wait > 0)
                     {
                         pathCopy = new List<Vector3>(path);
@@ -193,7 +225,7 @@ public class PlayerMap : MonoBehaviour
                             possiblePaths.Add(p);
                         }
                     }
-                }*/  
+                }  */
             }
         }
         return possiblePaths;
@@ -367,10 +399,8 @@ public class PlayerMap : MonoBehaviour
                         foreach(Transform onion in this.onions)
                         {
                             if(onion.gameObject.GetComponent<Food>().IsCut() && InMyPossession(onion)){
-                                Debug.Log("Im trying");
                                 foreach(Transform pan in this.pans)
                                 {
-                                    Debug.Log("I entered pans world");
                                     Soup soup = pan.GetComponent<Pan>().soup;
                                     if ((soup.type() == Item.type.onion || soup.type() == Item.type.none) && !soup.isDone())
                                     {
@@ -426,8 +456,11 @@ public class PlayerMap : MonoBehaviour
                         {
                             foreach(Transform c in this.cuttingBoards)
                             {
-                                Action newAction = new Action("deliverUncutedOnion", new Vector3(c.position.x, c.position.y, -1), c, i);
-                                possibleActions.Add(newAction);
+                                if (!c.gameObject.GetComponent<CuttingBoard>().hasItem)
+                                {
+                                    Action newAction = new Action("deliverUncutedOnion", new Vector3(c.position.x, c.position.y, -1), c, i);
+                                    possibleActions.Add(newAction);
+                                }
                             }
                             return possibleActions;
                         }
@@ -448,6 +481,229 @@ public class PlayerMap : MonoBehaviour
                         foreach (Vector3 v in this.onionDisp)
                         {
                             Action newAction = new Action("getNewOnion", new Vector3(v.x, v.y, -1), null, i);
+                            possibleActions.Add(newAction);
+                        }
+                    }
+                    break;
+
+                //Tomato Section
+                //Tomato Section
+                //Tomato Section
+                //Tomato Section
+                //Tomato Section
+                //Tomato Section
+                case "deliverSoupTomato":
+                    if (carrying)
+                    {
+                        if (this.plates.Contains(WhatImCarrying()) && WhatImCarrying().gameObject.GetComponent<Plate>().GetState() == Plate.State.tomSoup)
+                        {
+                            Action newAction = new Action("deliverSoupTomato", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), this.delivery, i);
+                            possibleActions.Add(newAction);
+                        }
+                    }
+                    break;
+
+                case "deliverPlateTomato":
+                    if (carrying)
+                    {
+                        if (this.plates.Contains(WhatImCarrying()) && WhatImCarrying().gameObject.GetComponent<Plate>().GetState() == Plate.State.tomato)
+                        {
+                            Action newAction = new Action("deliverPlateTomato", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), this.delivery, i);
+                            possibleActions.Add(newAction);
+                        }
+                    }
+                    break;
+                case "getPlateTomato":
+                    if (!carrying)
+                    {
+                        foreach(Transform plate in this.plates)
+                        {
+                            if (plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.tomato && !InPlayer(plate))
+                            {
+                                Action newAction = new Action("getPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                possibleActions.Add(newAction);
+                            }
+                        }
+                    }
+                    break;
+
+
+                case "getPlateSoupTomato":
+                    if (!carrying)
+                    {
+                        foreach (Transform plate in this.plates)
+                        {
+                            if (plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.tomSoup && !InPlayer(plate))
+                            {
+                                Action newAction = new Action("getPlateSoupTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                possibleActions.Add(newAction);
+                            }
+                        }
+                    }
+                    break;
+
+                case "deliverSoupInPlateTomato":
+                    if (carrying)
+                    {
+                        if (this.pans.Contains(WhatImCarrying()) && WhatImCarrying().GetComponent<Pan>().soup.isDone() && WhatImCarrying().GetComponent<Pan>().soup.type() == Item.type.tomato)
+                        {
+                            foreach (Transform plate in this.plates)
+                            {
+                                if (plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.empty && !InPlayer(plate))
+                                {
+                                    Action newAction = new Action("deliverSoupInPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                    possibleActions.Add(newAction);
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case "getSoupFromPanTomato":
+                    if (!carrying)
+                    {
+                        foreach (Transform pan in this.pans)
+                        {
+                            Soup soup = pan.GetComponent<Pan>().soup;
+                            if (!InPlayer(pan) && soup.gameObject.GetComponent<Soup>().isDone() && soup.type() == Item.type.tomato)     //free
+                            {
+                                Action newAction = new Action("getSoupFromPanTomato", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                possibleActions.Add(newAction);
+                            }
+                        }
+                    }
+                    break;
+
+                case "boilSoupTomato":
+                    if (!carrying)
+                    {
+                        foreach (Transform pan in this.pans)
+                        {
+                            Soup soup = pan.GetComponent<Pan>().soup;
+                            if (!InPlayer(pan) && soup.gameObject.GetComponent<Soup>().canBoil() && soup.type() == Item.type.tomato)
+                            {
+                                Action newAction = new Action("boilSoupTomato", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                possibleActions.Add(newAction);
+                            }
+
+                        }
+                    }
+                    break;
+
+
+                case "deliverCutedInSoupTomato":
+                    if (carrying)
+                    {
+                        foreach (Transform tomato in this.tomatos)
+                        {
+                            if (tomato.gameObject.GetComponent<Food>().IsCut() && InMyPossession(tomato))
+                            {
+                                foreach (Transform pan in this.pans)
+                                {
+                                    Soup soup = pan.GetComponent<Pan>().soup;
+                                    if ((soup.type() == Item.type.tomato || soup.type() == Item.type.none) && !soup.isDone())
+                                    {
+                                        Action newAction = new Action("deliverCutedInSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                        possibleActions.Add(newAction);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case "deliverCutedInPlateTomato":
+                    if (carrying)
+                    {
+                        foreach (Transform tomato in this.tomatos)
+                        {
+                            if (tomato.gameObject.GetComponent<Food>().IsCut() && InMyPossession(tomato))
+                            {
+                                foreach (Transform plate in this.plates)
+                                {
+                                    if(!InPlayer(plate) && plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.empty)
+                                    {
+                                        Action newAction = new Action("deliverCutedInPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                        possibleActions.Add(newAction);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+
+                case "getCutedTomato":
+                    if (!carrying)
+                    {
+                        foreach (Transform board in this.cuttingBoards)
+                        {
+                            GameObject a = null;
+                            if (board.gameObject.GetComponent<CuttingBoard>().onTop != null)
+                            {
+                                a = board.gameObject.GetComponent<CuttingBoard>().onTop.gameObject;
+                                if (a.name == "Tomato(Clone)" && a.GetComponent<Food>().IsCut())
+                                {
+                                    Action newAction = new Action("getCutedTomato", new Vector3(board.position.x, board.position.y, -1), board, i);
+                                    possibleActions.Add(newAction);
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case "cutTomato":
+                    if (!carrying)
+                    {
+                        foreach (Transform c in this.cuttingBoards)
+                        {
+                            foreach (Transform food in c)
+                            {
+                                if (food.gameObject.name == "Tomato(Clone)" && food.gameObject.GetComponent<Food>().IsCut())
+                                {
+                                    Action newAction = new Action("useCuttingBoard", new Vector3(c.position.x, c.position.y, -1), c, i);
+                                    possibleActions.Add(newAction);
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+
+                case "deliverUncutedTomato":
+                    //TODO
+                    foreach (Transform tomato in this.tomatos)
+                    {
+                        if (carrying && InMyPossession(tomato) && !tomato.gameObject.GetComponent<Food>().IsCut())
+                        {
+                            foreach (Transform c in this.cuttingBoards)
+                            {
+                                if(!c.gameObject.GetComponent<CuttingBoard>().hasItem)
+                                {
+                                    Action newAction = new Action("deliverUncutedTomato", new Vector3(c.position.x, c.position.y, -1), c, i);
+                                    possibleActions.Add(newAction);
+                                }
+                            }
+                            return possibleActions;
+                        }
+                    }
+                    break;
+
+
+                case "getTomato":
+                    if (!carrying)
+                    {
+                        foreach (Transform tomato in this.tomatos)
+                        {
+                            if (!tomato.gameObject.GetComponent<Food>().IsCut() && !InPlayer(tomato))     //exists but not cut and not in player possession
+                            {
+                                Action newAction = new Action("getTomato", new Vector3(tomato.position.x, tomato.position.y, -1), tomato, i);
+                                possibleActions.Add(newAction);
+                            }
+                        }
+                        foreach (Vector3 v in this.tomatoDisp)
+                        {
+                            Action newAction = new Action("getNewTomato", new Vector3(v.x, v.y, -1), null, i);
                             possibleActions.Add(newAction);
                         }
                     }
@@ -511,7 +767,11 @@ public class PlayerMap : MonoBehaviour
                 Debug.Log("Added an onion");
                 this.onions.Add(t);
                 break;
-                //TODO
+            //TODO
+            case "Tomato(Clone)":
+                Debug.Log("Added an onion");
+                this.tomatos.Add(t);
+                break;
             default:
                 break;
         }
@@ -525,10 +785,20 @@ public class PlayerMap : MonoBehaviour
                 Debug.Log("Removed an onion");
                 this.onions.Remove(t);
                 break;
+            case "Tomato(Clone)":
+                Debug.Log("Removed a tomato");
+                this.tomatos.Remove(t);
+                break;
             //TODO
             default:
                 break;
         }
+    }
+
+
+    public void InformTasks(List<AgentDecisionTask> bestTasks)
+    {
+        this.bestTasks = bestTasks;
     }
 
 }   

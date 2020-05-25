@@ -63,36 +63,29 @@ public class PlayerController : MonoBehaviour
     public void Act(List<bool> commands)
     {
         int xValue = 0, yValue = 0;
-
-
         //move left
         if (commands[0])
         {
-            Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING LEFT");
-
-            RotateLeft();
+            //Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING LEFT");
             xValue -= 1;
         }
         //move right
         else if (commands[1])
         {
-            Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING RIGHT");
-            RotateRight();
+            //Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING RIGHT");
             xValue += 1;
         }
         //move up
         else if (commands[2])
         {
-            Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING UP");
-            RotateUp();
+            //Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING UP");
             yValue += 1;
         }
 
         //move down
         else if (commands[3])
         {
-            Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING DOWN");
-            RotateDown();
+            //Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING DOWN");
             yValue -= 1;
         }
 
@@ -113,10 +106,9 @@ public class PlayerController : MonoBehaviour
             {
                 if (pan)
                 {
-                    Debug.Log("Yes its a fcking pan");
+
                     if (c.addPan(hold as Pan))
                     {   
-                        Debug.Log("meti?");
                         holding = false;
                         pan = false;
                     }
@@ -132,14 +124,12 @@ public class PlayerController : MonoBehaviour
             }
         }
         Vector3 a = transform.position + new Vector3(xValue, yValue);
+        RotateTowards(a);
         if (positions.Contains(a))
         {
             front += new Vector3(xValue, yValue);
             transform.position = a;
         }
-        transform.Rotate(this.up * new Vector3(0, 0, 1), 90f);
-        Debug.Log(this.gameObject.transform.rotation);
-        front = Quaternion.AngleAxis(90, this.up * new Vector3(0, 0, 1)) * front;
     }
 
 
@@ -184,7 +174,16 @@ public class PlayerController : MonoBehaviour
 
     public void RotateTowards(Vector3 target)
     {
+        //this.gameObject.transform.rotation.Set(Up.x,Up.y,Up.z,Up.w);
+        //this.facing = "up";
         Vector3 difference = target - this.gameObject.transform.position;
+        this.up = 0;
+
+        /*while(target != this.gameObject.transform.position + this.gameObject.transform.forward)
+        {
+            transform.Rotate(1 * new Vector3(0, 0, 1), 90f);
+            this.up++;
+        }*/
         if (difference.y < 0)
         {
             RotateDown();
@@ -199,20 +198,26 @@ public class PlayerController : MonoBehaviour
         }
         else if(difference.x > 0)
         {
-           RotateRight();
+            RotateRight();
         }
-        transform.Rotate(this.up * new Vector3(0, 0, 1), 90f);
-        Debug.Log(this.gameObject.transform.rotation);
+        transform.Rotate( new Vector3(0, 0, 1), this.up * 90f);
+        //Debug.Log(this.gameObject.transform.rotation);
         front = Quaternion.AngleAxis(90, this.up * new Vector3(0, 0, 1)) * front;
     }
 
     private void RotateUp()
     {
-        Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating UP");
-        Debug.Log(this.gameObject.transform.rotation);
+        //Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + " facing : " + this.facing + "  Rotating UP");
         if (facing.Equals("down"))
         {
-            this.up += 2;
+            if(this.gameObject.transform.rotation.eulerAngles.z > 0)
+            {
+                this.up -= 2;
+            }
+            else
+            {
+                this.up += 2;
+            }
         }
         else if (facing.Equals("left"))
         {
@@ -228,11 +233,17 @@ public class PlayerController : MonoBehaviour
 
     private void RotateDown()
     {
-        Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating DOWN");
-        Debug.Log(this.gameObject.transform.rotation);
+        //Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + " facing : " + this.facing + "now  Rotating DOWN");
         if (facing.Equals("up"))
         {
-            this.up -= 2;
+            if (this.gameObject.transform.rotation.eulerAngles.z > 0)
+            {
+                this.up -= 2;
+            }
+            else
+            {
+                this.up += 2;
+            }
         }
         else if (facing.Equals("left"))
         {
@@ -247,15 +258,21 @@ public class PlayerController : MonoBehaviour
 
     private void RotateLeft()
     {
-        Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating LEFT");
-        Debug.Log(this.gameObject.transform.rotation);
+        //Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + " facing : " + this.facing + "  Rotating LEFT");
         if (facing.Equals("up"))
         {
             this.up += 1;
         }
         else if (facing.Equals("right"))
         {
-            this.up += 2;
+            if (this.gameObject.transform.rotation.eulerAngles.z > 0)
+            {
+                this.up -= 2;
+            }
+            else
+            {
+                this.up += 2;
+            }
         }
         else if (facing.Equals("down"))
         {
@@ -266,15 +283,22 @@ public class PlayerController : MonoBehaviour
 
     private void RotateRight()
     {
-        Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating RIGHT");
-        Debug.Log(this.gameObject.transform.rotation);
+        //Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + " facing : " + this.facing + "  Rotating RIGHT");
         if (facing.Equals("up"))
         {
             this.up -= 1;
         }
         else if (facing.Equals("left"))
         {
-            this.up += 2;
+            if (this.gameObject.transform.rotation.eulerAngles.z > 0)
+            {
+                this.up -= 2;
+            }
+            else
+            {
+                this.up += 2;
+            }
+
         }
         else if (facing.Equals("down"))
         {

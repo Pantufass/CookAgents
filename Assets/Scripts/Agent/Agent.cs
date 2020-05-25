@@ -22,9 +22,11 @@ public class Agent : MonoBehaviour
 
     private Task currentTask = null;
 
-    private bool once = false;
-
     private int delay = 2;
+
+    private int pathSize = 0;
+
+    private bool stoped = false;
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +47,7 @@ public class Agent : MonoBehaviour
         else
         {
             Perceive();
+            delay = 2;
         }
         
     }
@@ -111,20 +114,21 @@ public class Agent : MonoBehaviour
     {
         List<AgentDecisionTask> bestTasks = policy.RationalDecision(this.iterationTasks);
         this.iterationTasks = new List<AgentTasksInfo>();
+
+        foreach(GameObject p in otherPlayers)
+        {
+            p.GetComponent<Agent>().InformTasks(bestTasks);
+        }
+        this.InformTasks(bestTasks);
+        
+    }
+
+    public void InformTasks(List<AgentDecisionTask> bestTasks)
+    {
+        map.InformTasks(bestTasks);
         foreach(AgentDecisionTask adt in bestTasks)
         {
-            if(adt.GetId() != this.GetId())
-            {
-                foreach(GameObject g in otherPlayers)
-                {
-                    Agent a = g.GetComponent<Agent>();
-                    if (a.GetId() == adt.GetId())
-                    {
-                        a.Act(adt.GetTask());
-                    }
-                }
-            }
-            else
+            if(adt.GetId() == this.id)
             {
                 this.Act(adt.GetTask());
             }
@@ -133,10 +137,12 @@ public class Agent : MonoBehaviour
 
     private void Act(Task task)
     {
-        Debug.Log("Agent: " + id + "   Doing: " + task.GetAction().GetActionType());
+        //Debug.Log("Agent: " + id + "   Doing: " + task.GetAction().GetActionType());
         if(currentTask == null)
         {
             currentTask = task;
+            stoped = false;
+            pathSize = 0;
         }
         Vector3 position = this.gameObject.transform.position;
 
@@ -168,6 +174,22 @@ public class Agent : MonoBehaviour
                 com.Add(false);
                 controller.Act(com);
             }
+            else
+            {
+                if(this.pathSize == path.Count)
+                {
+                    if (stoped)
+                    {
+                        Debug.Log("Agent: " + this.id + " cancelling task");
+                        currentTask = null;
+                    }
+                    else
+                    {
+                        stoped = true;
+                    }
+                }
+            }
+            pathSize = path.Count;
 
         }
         else
@@ -346,8 +368,10 @@ public class Agent : MonoBehaviour
     private void ReceiveAgentTasks(AgentTasksInfo tasks)
     {
         iterationTasks.Add(tasks);
-        if(iterationTasks.Count == otherPlayers.Count + 1)
+        Debug.Log(iterationTasks.Count);
+        if (iterationTasks.Count == otherPlayers.Count + 1)
         {
+            Debug.Log("lets gooo");
             Decide();
         }
     }
