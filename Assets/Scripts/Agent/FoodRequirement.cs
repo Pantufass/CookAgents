@@ -44,8 +44,10 @@ public class FoodRequirement : Requirement
 
     public override bool sucess()
     {
+        if (!cut) return base.sucess();
         bool b = prev.sucess();
         b = b && cutted.sucess();
-        return b;
+        return b && base.sucess();
     }
+
 }

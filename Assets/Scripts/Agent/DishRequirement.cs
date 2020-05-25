@@ -12,6 +12,9 @@ public class DishRequirement : Requirement
     {
         recipient = r;
         dish = foods;
+        pos = r.pos;
+        t = type.dish;
+        
     }
 
     public override bool sucess()
@@ -22,5 +25,26 @@ public class DishRequirement : Requirement
             b = b && r.sucess();
         }
         return b;
+    }
+
+    public override bool canDivide()
+    {
+        bool b = true;
+        foreach (Requirement r in dish)
+        {
+            b = b && r.sucess();
+        }
+        return !b;
+    }
+
+    public override List<Requirement> divide()
+    {
+        if (!canDivide()) return null;
+        List<Requirement> lr = new List<Requirement>();
+        foreach(Requirement r in dish)
+        {
+            lr.Add(r);
+        }
+        return lr;
     }
 }

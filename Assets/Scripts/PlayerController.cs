@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     public GameObject ground;
 
-    private GameObject agent;
+    private Agent agent;
 
     private List<Vector3> positions;
 
@@ -24,7 +24,14 @@ public class PlayerController : MonoBehaviour
 
     private PlayerController[] players;
 
-    public PlayerController(GameObject agent)
+    //able/disable agent control
+    private bool agentControl = false;
+    public PlayerController(Agent agent)
+    {
+        this.agent = agent;
+    }
+
+    public void addAgent(Agent agent)
     {
         this.agent = agent;
     }
@@ -55,7 +62,12 @@ public class PlayerController : MonoBehaviour
     void LateUpdate()
     {
         List<bool> commands = getInput();
+        if(!agentControl) cycle(commands);
+        
+    }
 
+    public void cycle(List<bool> commands)
+    {
         int xValue = 0, yValue = 0, up = 0;
 
 
@@ -73,14 +85,14 @@ public class PlayerController : MonoBehaviour
         //rotate right
         if (commands[5]) up -= 1;
 
-        if(c != null && triggered)
+        if (c != null && triggered)
         {
-            //pick up
+            //use
             if (commands[6])
             {
                 c.use(gameObject);
             }
-            //use
+            //pick up
             if (commands[7])
             {
                 if (pan)
@@ -97,17 +109,21 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                 {
-                    if (c.pickUp(gameObject)) holding = true;
+                    if (c.pickUp(gameObject))
+                    {
+                        holding = true;
+                        GameEvents.current.PickUp(agent.id);
+                    }
                 }
             }
         }
-        Vector3 a = transform.position + new Vector3(xValue,yValue);
+        Vector3 a = transform.position + new Vector3(xValue, yValue);
         if (positions.Contains(a) && canMove(a))
         {
             front += new Vector3(xValue, yValue);
             transform.position = a;
         }
-        transform.Rotate(up*new Vector3(0,0,1),90f);
+        transform.Rotate(up * new Vector3(0, 0, 1), 90f);
         front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
     }
 

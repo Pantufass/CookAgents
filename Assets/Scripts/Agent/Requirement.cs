@@ -14,6 +14,7 @@ public class Requirement
 
     public Vector3 target;
 
+    public bool requested = false;
     public Requirement()
     {
     }
@@ -59,5 +60,15 @@ public class Requirement
         finished = true;
     }
 
-    
+    public virtual bool canDivide()
+    {
+        return false;
+    }
+
+
+    public virtual List<Requirement> divide()
+    {
+        return null;
+    }
+
 }

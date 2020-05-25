@@ -34,7 +34,7 @@ public class FoodRequests : MonoBehaviour
         addRecipe(Plate.State.tomSoup);
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if(requests.Count < 5)
         {
@@ -101,4 +101,5 @@ public class FoodRequests : MonoBehaviour
     {
         return requests[0];
     }
+
 }

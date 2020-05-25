@@ -35,6 +35,10 @@ public class Objective : Requirement
         requirements = new List<Requirement>();
     }
 
+    public override bool canDivide()
+    {
+        return requirements.Count > 0;
+    }
     public Requirement nextReq()
     {
         foreach (Requirement r in requirements)
@@ -96,13 +100,12 @@ public class Objective : Requirement
         List<Requirement> panDish = new List<Requirement>();
         panDish.Add(dr);
 
-        //soup dish requirement
-        requirements.Add(dr);
+        //plate the soup
+        requirements.Add(new DishRequirement(panDish, new Requirement(type.plate)));
+
         //boil the soup
         requirements.Add(new Requirement(type.boil));
 
-        //plate the soup
-        requirements.Add(new DishRequirement(panDish, new Requirement(type.plate)));
 
         //deliver it
         requirements.Add(new Requirement(type.deliver));
@@ -141,13 +144,11 @@ public class Objective : Requirement
         List<Requirement> panDish = new List<Requirement>();
         panDish.Add(dr);
 
-        //soup dish requirement
-        requirements.Add(dr);
+        //plate the soup
+        requirements.Add(new DishRequirement(panDish, new Requirement(type.plate)));
         //boil the soup
         requirements.Add(new Requirement(type.boil));
 
-        //plate the soup
-        requirements.Add(new DishRequirement(panDish, new Requirement(type.plate)));
 
         //deliver it
         requirements.Add(new Requirement(type.deliver));
@@ -176,4 +177,14 @@ public class Objective : Requirement
         requirements.Add(new Requirement(type.deliver));
     }
 
+    public override List<Requirement> divide()
+    {
+        if (!canDivide()) return null;
+        List<Requirement> lr = new List<Requirement>();
+        foreach (Requirement r in requirements)
+        {
+            lr.Add(r);
+        }
+        return lr;
+    }
 }

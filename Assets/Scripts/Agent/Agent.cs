@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Agent : MonoBehaviour
 {
-    private int id;
+    public int id;
 
     private List<GameObject> otherPlayers = new List<GameObject>();
 
@@ -14,7 +14,9 @@ public class Agent : MonoBehaviour
 
     private List<Requirement> requestList;
 
-    private Requirement currentObjective;
+    private int layeredReq;
+    private Objective currentObjective;
+    private Requirement currentReq;
     private Task currentTask;
     
     private PlayerMap map = new PlayerMap();
@@ -24,12 +26,14 @@ public class Agent : MonoBehaviour
     void Start()
     {
         requestList = new List<Requirement>();
-        controller = FindObjectOfType<PlayerController>();
+        controller = gameObject.GetComponent<PlayerController>();
+        controller.addAgent(this);
 
         GameEvents.current.OnRecipeEnter += newRecipe;
         GameEvents.current.OnRequestEnter += newRequest;
 
         delivery = GameObject.FindGameObjectWithTag("Delivery");
+        layeredReq = 10;
     }
 
     GameObject closest(Vector3 pos)
@@ -56,6 +60,7 @@ public class Agent : MonoBehaviour
         }
         return closest;
     }
+
     void newRecipe(Plate.State r)
     {
         //make requests if it is the closest one
@@ -73,42 +78,15 @@ public class Agent : MonoBehaviour
         requestList.Add(o);
     }
 
-    void createRequest(Plate.State r)
+    GameObject getClosest(Requirement r, int layer, List<GameObject> other)
     {
-        Objective o = new Objective(r);
-        o.target = delivery.transform.position;
-        requestList.Add(o);
-        foreach(Requirement req in o.requirements)
-        {
-            GameEvents.current.RequestEnter(req);
-        }
-
-    }
-
-    void passRequests(Requirement r)
-    {
-        FoodRequirement fr = r as FoodRequirement;
-        if(fr != null)
-        {
-            if (fr.cut)
-            {
-                fr.prev.target = this.transform.position;
-                GameEvents.current.RequestEnter(fr.prev);
-                requestList.Add(fr);
-            }
-        }
-        else
-        {
-            requestList.Add(r);
-        }
-
-    }
-
-    void newRequest(Requirement r)
-    {
-        if (currentObjective != null) return;
+        if (currentReq != null && !(layer < layeredReq)) return null;
         GameObject closest = gameObject;
-        float minDist = 10000;
+        float minDist = 1000;
+        if (r.pos.Count > 0)
+        {
+            minDist = Vector3.Distance(gameObject.transform.position, r.pos[0]);
+        }
         foreach (Vector3 p in r.pos)
         {
             float auxDist = Vector3.Distance(gameObject.transform.position, p);
@@ -121,10 +99,10 @@ public class Agent : MonoBehaviour
             //if its too close doesnt need to compute others
             if (!false)
             {
-                foreach (GameObject agent in otherPlayers)
+                foreach (GameObject agent in other)
                 {
                     auxDist = Vector3.Distance(agent.transform.position, p);
-                    if (auxDist < minDist)
+                    if (auxDist < minDist || (auxDist == minDist && id < agent.GetComponent<Agent>().id))
                     {
                         minDist = auxDist;
                         closest = agent;
@@ -132,78 +110,219 @@ public class Agent : MonoBehaviour
                 }
             }
         }
+        return closest;
+    }
 
+    void recursive(Requirement r, int layer, List<GameObject> other)
+    {
+        if (r.requested) return;
+        GameObject closest = getClosest(r, layer, other);
+        if (closest == null) return;
         if (closest == gameObject)
         {
-            currentObjective = r;
+            currentReq = r;
+            layeredReq = layer;
+            currentReq.requested = true;
+        }
+        else
+        {
+            //ask closest
+            Agent a = closest.GetComponent<Agent>();
+            if (a.youbusy(r, layer))
+            {
+                //its busy
+                List<GameObject> objs = new List<GameObject>();
+                foreach (GameObject o in other)
+                {
+                    if (o != closest)
+                    {
+                        objs.Add(o);
+                    }
+                }
+                //again without the busy closest
+                recursive(r, layer, objs);
+            }
+            
         }
     }
 
+    void newRequest(Requirement r,int layer)
+    {
+        if (!r.requested)
+        {
+            List<GameObject> objs = new List<GameObject>();
+            foreach (GameObject o in otherPlayers)
+            {
+                objs.Add(o);
+            }
+            recursive(r, layer, objs);
+        }
+
+    }
+
+    //know if other agent is closer and available to requirement
+    //true if busy or if more distant
+    public bool youbusy(Requirement r, int layer)
+    {
+        return r != currentReq && currentReq != null && !(layer < layeredReq);
+    }
+
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         Perceive();
         Decide();
         Act();
+        Debug.Log(currentReq + " " +id);
+
+        foreach(GameObject a in otherPlayers)
+        {
+            if (a.GetComponent<Agent>().currentReq == this.currentReq) Debug.Log("FUCK");
+        }
     }
 
-    //perceive current objective
+    //just throw requests (it perceives what to do when it receives a request)
     private void Perceive()
     {
-        if(currentObjective == null && requestList[0] != null)
+        if(currentObjective == null && requestList.Count > 0)
         {
             //update new objective
-            currentObjective = requestList[0];
+            currentObjective = requestList[0] as Objective;
 
             //throw request
-            Objective o = currentObjective as Objective;
-            if(o != null) GameEvents.current.RequestEnter(o.nextReq());
+            Requirement r = currentObjective.nextReq();
+            r.target = this.transform.position;
+            GameEvents.current.RequestEnter(r,layeredReq);
         }
         else
         {
-
+            if(currentObjective != null)
+            {
+                Requirement r = currentObjective.nextReq();
+                    r.target = this.transform.position;
+                    GameEvents.current.RequestEnter(r, 10);
+            }
+             if(currentReq != null)
+            {
+                if (!currentReq.sucess())
+                {
+                    if (currentReq.canDivide())
+                    {
+                        List<Requirement> rq = currentReq.divide();
+                        if(rq != null)
+                        {
+                            foreach (Requirement r in rq)
+                            {
+                                    r.target = this.transform.position;
+                                    GameEvents.current.RequestEnter(r, layeredReq - 1);
+                                
+                            }
+                        }
+                        
+                    }
+                }
+            }
         }
 
 
     }
 
-    //decide based on objective
+    //translate objective into task
     private void Decide()
     {
-
-    }
-
-    //act based on task
-    private void Act()
-    {
-
-    }
-
-
-    private Request GetMostRecentRequest()
-    {
-        //TODO
-        return null;
-    }
-
-    private List<Action> GetPossibleActionsForRequest(Request request)
-    {
-        //TODO
-        return new List<Action>(); 
-    }
-
-
-
-
-    private void ReceiveAgentTasks(List<Task> tasks)
-    {
-        iterationTasks.Add(tasks);
-        if(iterationTasks.Count == otherPlayers.Count + 1)
+        if(currentReq != null)
         {
-            Debug.Log("lets gooo");
-            Decide();
+            if(currentTask == null)
+            {
+                FoodRequirement fr = currentReq as FoodRequirement;
+                if(fr != null)
+                {
+                    currentTask = new FoodTask(fr,this);
+                    currentTask.findClosestTarget(this);
+                }
+                else
+                {
+                    DishRequirement dr = currentReq as DishRequirement;
+                    if(dr != null)
+                    {
+                        currentTask = new DishTask(dr,this);
+                        currentTask.findClosestTarget(this);
+                    }
+                    else
+                    {
+                        currentTask = new Task(currentReq,this);
+                        currentTask.findClosestTarget(this);
+                    }
+                }
+            }
+            else
+            {
+                    FoodTask ft = currentTask as FoodTask;
+                    if (ft != null)
+                    {
+                        if (ft.gotThere(this))
+                        {
+                            if (ft.part1)
+                            {
+                                if (ft.cutting())
+                                {
+
+                                }
+                            }
+                            if (ft.picking())
+                            {
+                                if (ft.pickedUp())
+                                {
+                                    
+                                    ft.part1 = true;
+                                    ft.goCut(this);
+                                }
+                            }
+                        }
+                        
+                        
+                    }
+                
+
+                
+            }
         }
     }
+
+    //transform task into commands 
+    private void Act()
+    {
+        List<bool> commands = new List<bool>();
+        for(int i = 0; i < 8; i++)
+        {
+            commands.Add(false);
+        }
+
+        commands[4] = Random.Range(0, 2) == 0;
+
+        switch (currentTask.a)
+        {
+            case Task.action.move:
+                bool[] b = currentTask.getDirection(this);
+                for(int i = 0; i < b.Length; i++)
+                {
+                    commands[i] = b[i];
+                }
+                break;
+            case Task.action.pickUp:
+                commands[7] = true;
+                break;
+            case Task.action.drop:
+                commands[7] = true;
+                break;
+            default:
+                commands[6] = true;
+                break;
+        }
+
+        controller.cycle(commands);
+    }
+
 
     public void AddOtherPlayer(GameObject player)
     {
