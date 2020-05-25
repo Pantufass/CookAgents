@@ -56,6 +56,7 @@ public class Agent : MonoBehaviour
 
         if(currentTask == null)
         {
+            Debug.Log("currentTask = null");
             int taskId = 0;
             Plate.State request = GetMostRecentRequest();
             List<Action> actions = GetPossibleActionsForRequest(request);
@@ -141,8 +142,13 @@ public class Agent : MonoBehaviour
 
         List<Vector3> path = currentTask.GetPath();
 
+        if (currentTask.GetAction().GetGoal2() != null && (currentTask.GetAction().GetGoal1().x != currentTask.GetAction().GetGoal2().position.x || currentTask.GetAction().GetGoal1().y != currentTask.GetAction().GetGoal2().position.y) && (currentTask.GetAction().GetGoal2().position.x != this.gameObject.transform.position.x || currentTask.GetAction().GetGoal2().position.y != this.gameObject.transform.position.y))
+        {
+            currentTask = null;
+            return;
+        }
 
-        if(path.Count > 1)
+        if (path.Count > 1)
         {
             //currentPos = path[0]
             Vector3 nextPos = path[1];
@@ -156,10 +162,10 @@ public class Agent : MonoBehaviour
                 com.Add(walk.x == 1);
                 com.Add(walk.y == 1);
                 com.Add(walk.y == -1);
-                com.Add(Input.GetKey(KeyCode.Q));
-                com.Add(Input.GetKey(KeyCode.E));
-                com.Add(Input.GetKey(KeyCode.X));
-                com.Add(Input.GetKey(KeyCode.Z));
+                com.Add(false);
+                com.Add(false);
+                com.Add(false);
+                com.Add(false);
                 controller.Act(com);
             }
 
@@ -168,7 +174,12 @@ public class Agent : MonoBehaviour
         {
             controller.RotateTowards(currentTask.GetAction().GetGoal1());
 
-            if (currentTask.GetAction().GetActionType().Equals("getCutedOnion"))
+            if (currentTask.GetAction().GetActionType().IndexOf("getCuted") > -1)
+            {
+                Use();
+                this.currentTask = null;
+            }
+            else if (currentTask.GetAction().GetActionType().IndexOf("getSoupFromPan") > -1)
             {
                 Use();
                 this.currentTask = null;
@@ -183,15 +194,23 @@ public class Agent : MonoBehaviour
                 }
                 
             }
+            else if(currentTask.GetAction().GetActionType().IndexOf("getPlateSoupOnion") > -1)
+            {
+                Use();
+                foreach (Transform t in this.gameObject.transform)
+                {
+                    this.currentTask = null;
+                }
+            }
             else if(currentTask.GetAction().GetActionType().IndexOf("get") > -1)
             {
                 PickUp();
 
                 foreach(Transform t in this.gameObject.transform)
                 {
-                    this.currentTask = null;
-                    return;
+
                 }
+                this.currentTask = null;
                 
             }
             else if(currentTask.GetAction().GetActionType().IndexOf("deliverCutedInSoup") > -1)
@@ -222,14 +241,19 @@ public class Agent : MonoBehaviour
                 PickUp();
                 this.currentTask = null;
             }
-            else if(currentTask.GetAction().GetActionType().IndexOf("getSoupFromPan") > -1)
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliverSoupInPlate") > -1)
             {
                 Use();
                 this.currentTask = null;
             }
-            else if(currentTask.GetAction().GetActionType().IndexOf("deliverSoupInPlateOnion") > -1)
+            else if (currentTask.GetAction().GetActionType().Equals("replacePanInStove"))
             {
-                PickUp();
+                Use();
+                this.currentTask = null;
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliverSoupOnion") > -1)
+            {
+                Use();
                 this.currentTask = null;
             }
             else if(currentTask.GetAction().GetActionType().IndexOf("deliver") > -1 || currentTask.GetAction().GetActionType().IndexOf("use") > -1)

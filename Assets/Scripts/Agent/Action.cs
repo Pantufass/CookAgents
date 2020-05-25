@@ -7,13 +7,15 @@ public class Action
 
     private string actionType;
     private Vector3 goal1;
-    private Vector3 goal2;
+    private Transform goal2;
+    private int priority;
 
-    public Action(string actionType, Vector3 goal1, Vector3 goal2)
+    public Action(string actionType, Vector3 goal1, Transform goal2, int priority)
     {
         this.actionType = actionType;
         this.goal1 = goal1;
         this.goal2 = goal2;
+        this.priority = priority;
     }
 
 
@@ -22,7 +24,7 @@ public class Action
         return this.goal1;
     }
 
-    public Vector3 GetGoal2()
+    public Transform GetGoal2()
     {
         return this.goal2;
     }
@@ -30,5 +32,10 @@ public class Action
     public string GetActionType()
     {
         return this.actionType;
+    }
+
+    public int GetPriority()
+    {
+        return this.priority;
     }
 }

@@ -8,6 +8,7 @@ public class Policy
     private readonly int colisionPenalty = 100;
     private readonly int concurrencyPenalty = 5;
     private readonly int bonusForProximity = 10;
+    private readonly int priorityPenalty = 2;
 
     private TaskSet bestSet;
 
@@ -117,6 +118,8 @@ public class Policy
         {
             int size = tasks[i].GetPath().Count;
             cost += size;
+
+            cost += (tasks[i].GetAction().GetPriority() * this.priorityPenalty);
 
             if(size == 1)
             {

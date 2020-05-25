@@ -18,13 +18,30 @@ public class PlayerController : MonoBehaviour
 
     public string facing = "up";
 
+    int up = 0;
+
     public Counter c = null;
 
     private FoodRequests fr;
 
+    private Quaternion Left = new Quaternion(); 
+
+    private Quaternion Right = new Quaternion(); 
+
+    private Quaternion Up = new Quaternion(); 
+
+    private Quaternion Down = new Quaternion(); 
+
 
     private void Start()
     {
+        Up.Set(0, 0, 0, 1);
+        Down.Set(0.0f, 0.0f, 1, 0);
+        Right.Set(0.0f, 0.0f, -0.7f, 0.7f);
+        Left.Set(0.0f, 0.0f, 0.7f, 0.7f);
+
+
+
         this.front = new Vector3(0,1,0);
 
         this.ground = GameObject.FindGameObjectWithTag("Ground");
@@ -45,29 +62,29 @@ public class PlayerController : MonoBehaviour
 
     public void Act(List<bool> commands)
     {
-        int xValue = 0, yValue = 0, up = 0;
-
+        int xValue = 0, yValue = 0;
 
 
         //move left
         if (commands[0])
         {
             Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING LEFT");
-            up = RotateLeft(up);
+
+            RotateLeft();
             xValue -= 1;
         }
         //move right
         else if (commands[1])
         {
             Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING RIGHT");
-            up = RotateRight(up);
+            RotateRight();
             xValue += 1;
         }
         //move up
         else if (commands[2])
         {
             Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING UP");
-            up = RotateUp(up);
+            RotateUp();
             yValue += 1;
         }
 
@@ -75,14 +92,14 @@ public class PlayerController : MonoBehaviour
         else if (commands[3])
         {
             Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING DOWN");
-            up = RotateDown(up);
+            RotateDown();
             yValue -= 1;
         }
 
         //rotate left
-        if (commands[4]) up += 1;
+        if (commands[4]) this.up += 1;
         //rotate right
-        if (commands[5]) up -= 1;
+        if (commands[5]) this.up -= 1;
 
         if (c != null && triggered)
         {
@@ -98,7 +115,7 @@ public class PlayerController : MonoBehaviour
                 {
                     Debug.Log("Yes its a fcking pan");
                     if (c.addPan(hold as Pan))
-                    {
+                    {   
                         Debug.Log("meti?");
                         holding = false;
                         pan = false;
@@ -120,8 +137,9 @@ public class PlayerController : MonoBehaviour
             front += new Vector3(xValue, yValue);
             transform.position = a;
         }
-        transform.Rotate(up * new Vector3(0, 0, 1), 90f);
-        front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
+        transform.Rotate(this.up * new Vector3(0, 0, 1), 90f);
+        Debug.Log(this.gameObject.transform.rotation);
+        front = Quaternion.AngleAxis(90, this.up * new Vector3(0, 0, 1)) * front;
     }
 
 
@@ -166,101 +184,102 @@ public class PlayerController : MonoBehaviour
 
     public void RotateTowards(Vector3 target)
     {
-        Vector3 difference = this.gameObject.transform.position - target;
-        int up = 0;
-        if (difference.y > 0)
+        Vector3 difference = target - this.gameObject.transform.position;
+        if (difference.y < 0)
         {
-            up = RotateDown(up);
+            RotateDown();
         }
-        else if(difference.y < 0)
+        else if(difference.y > 0)
         {
-            up = RotateUp(up);
-        }
-        else if(difference.x > 0)
-        {
-            up = RotateLeft(up);
+            RotateUp();
         }
         else if(difference.x < 0)
         {
-            up = RotateRight(up);
+            RotateLeft();
         }
-        transform.Rotate(up * new Vector3(0, 0, 1), 90f);
-        front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
+        else if(difference.x > 0)
+        {
+           RotateRight();
+        }
+        transform.Rotate(this.up * new Vector3(0, 0, 1), 90f);
+        Debug.Log(this.gameObject.transform.rotation);
+        front = Quaternion.AngleAxis(90, this.up * new Vector3(0, 0, 1)) * front;
     }
 
-    private int RotateUp(int up)
+    private void RotateUp()
     {
         Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating UP");
+        Debug.Log(this.gameObject.transform.rotation);
         if (facing.Equals("down"))
         {
-            up += 2;
+            this.up += 2;
         }
         else if (facing.Equals("left"))
         {
-            up -= 1;
+            this.up -= 1;
         }
         else if (facing.Equals("right"))
         {
-            up += 1;
+            this.up += 1;
         }
         facing = "up";
-        return up;
+
     }
 
-    private int RotateDown(int up)
+    private void RotateDown()
     {
         Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating DOWN");
+        Debug.Log(this.gameObject.transform.rotation);
         if (facing.Equals("up"))
         {
-            up -= 2;
+            this.up -= 2;
         }
         else if (facing.Equals("left"))
         {
-            up += 1;
+            this.up += 1;
         }
         else if (facing.Equals("right"))
         {
-            up -= 1;
+            this.up -= 1;
         }
         facing = "down";
-        return up;
     }
 
-    private int RotateLeft(int up)
+    private void RotateLeft()
     {
         Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating LEFT");
+        Debug.Log(this.gameObject.transform.rotation);
         if (facing.Equals("up"))
         {
-            up += 1;
+            this.up += 1;
         }
         else if (facing.Equals("right"))
         {
-            up += 2;
+            this.up += 2;
         }
         else if (facing.Equals("down"))
         {
-            up -= 1;
+            this.up -= 1;
         }
         facing = "left";
-        return up;
     }
 
-    private int RotateRight(int up)
+    private void RotateRight()
     {
         Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating RIGHT");
+        Debug.Log(this.gameObject.transform.rotation);
         if (facing.Equals("up"))
         {
-            up -= 1;
+            this.up -= 1;
         }
         else if (facing.Equals("left"))
         {
-            up += 2;
+            this.up += 2;
         }
         else if (facing.Equals("down"))
         {
-            up += 1;
+            this.up += 1;
         }
         facing = "right";
-        return up;
     }
 }
