@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Item : MonoBehaviour
 {
-    public enum type {tomato,lettuce,onion,plate,pan }
+    public enum type {tomato,lettuce,onion,plate,pan, none }
 
     public type t;
 

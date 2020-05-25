@@ -51,7 +51,7 @@ public class Soup : MonoBehaviour, PlatableFood
         {
             return cooking[0].t;
         }
-        return Item.type.onion;
+        return Item.type.none;
     }
 
     public void Boiled()
