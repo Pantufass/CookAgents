@@ -39,7 +39,6 @@ public class Agent : MonoBehaviour
         Perceive();
         if (!once)
         {
-            Perceive();
             Debug.Log("Update");
             Debug.Log(this.iterationTasks.Count);
             Debug.Log(this.otherPlayers.Count);
