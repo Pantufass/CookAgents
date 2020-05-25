@@ -19,7 +19,7 @@ public class FoodRequests : MonoBehaviour
     void Start()
     {
         requests = new List<Plate.State>();
-        addForNow();
+        //addForNow();
         r = new System.Random();
         ar = FindObjectOfType<ActiveRequests>();
     }
@@ -27,11 +27,11 @@ public class FoodRequests : MonoBehaviour
 
     private void addForNow()
     {
-        requests.Add(Plate.State.onSoup);
-        requests.Add(Plate.State.tomato);
-        requests.Add(Plate.State.tomSoup);
-        requests.Add(Plate.State.salad);
-        requests.Add(Plate.State.salad);
+        addRecipe(Plate.State.onSoup);
+        addRecipe(Plate.State.salad);
+        addRecipe(Plate.State.tomSoup);
+        addRecipe(Plate.State.lettuce);
+        addRecipe(Plate.State.tomSoup);
     }
 
     private void Update()
@@ -46,11 +46,27 @@ public class FoodRequests : MonoBehaviour
     {
         System.Array values = System.Enum.GetValues(typeof(Plate.State));
         Plate.State random = (Plate.State)values.GetValue(r.Next(values.Length));
-        requests.Add(random);
+        if (random != Plate.State.empty)
+        {
+            addRecipe(random);
+        }
+        else
+        {
+            createRequest();
+        }
+    }
+
+    private void addRecipe(Plate.State r)
+    {
+        requests.Add(r);
+
+        //call event, new recipe
+        GameEvents.current.RecipeEnter(r);
     }
 
     public Sprite getRecipe(int i)
     {
+        if(i < requests.Count)
         switch (requests[i])
         {
             case Plate.State.lettuce:

@@ -296,7 +296,7 @@ GameObject:
   - component: {fileID: 97895967}
   m_Layer: 0
   m_Name: Stove
-  m_TagString: Untagged
+  m_TagString: Stove
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -473,7 +473,7 @@ GameObject:
   - component: {fileID: 217165966}
   m_Layer: 0
   m_Name: OnionDisp
-  m_TagString: Untagged
+  m_TagString: Onion
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -651,7 +651,7 @@ GameObject:
   - component: {fileID: 277173563}
   m_Layer: 0
   m_Name: Plate
-  m_TagString: Untagged
+  m_TagString: Plate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2216,7 +2216,7 @@ GameObject:
   - component: {fileID: 604035539}
   m_Layer: 0
   m_Name: Stove
-  m_TagString: Untagged
+  m_TagString: Stove
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5800,7 +5800,7 @@ GameObject:
   - component: {fileID: 1219565061}
   m_Layer: 0
   m_Name: OnionDisp
-  m_TagString: Untagged
+  m_TagString: Onion
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6140,7 +6140,7 @@ GameObject:
   - component: {fileID: 1286820774}
   m_Layer: 0
   m_Name: Pan
-  m_TagString: Untagged
+  m_TagString: Pan
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6590,7 +6590,7 @@ GameObject:
   - component: {fileID: 1350081013}
   m_Layer: 0
   m_Name: LettuceDisp
-  m_TagString: Untagged
+  m_TagString: Lettuce
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6849,7 +6849,7 @@ GameObject:
   - component: {fileID: 1401985697}
   m_Layer: 0
   m_Name: TomatoDisp
-  m_TagString: Untagged
+  m_TagString: Tomato
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6946,7 +6946,7 @@ GameObject:
   - component: {fileID: 1402183545}
   m_Layer: 0
   m_Name: CuttingBoard
-  m_TagString: Untagged
+  m_TagString: CuttingBoard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7042,7 +7042,7 @@ GameObject:
   - component: {fileID: 1405526089}
   m_Layer: 0
   m_Name: Stove
-  m_TagString: Untagged
+  m_TagString: Stove
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7624,7 +7624,7 @@ GameObject:
   - component: {fileID: 1574641294}
   m_Layer: 0
   m_Name: CuttingBoard
-  m_TagString: Untagged
+  m_TagString: CuttingBoard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8101,7 +8101,7 @@ GameObject:
   - component: {fileID: 1672152237}
   m_Layer: 0
   m_Name: TomatoDisp
-  m_TagString: Untagged
+  m_TagString: Tomato
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8603,7 +8603,7 @@ GameObject:
   - component: {fileID: 1767631741}
   m_Layer: 0
   m_Name: LettuceDisp
-  m_TagString: Untagged
+  m_TagString: Lettuce
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9017,7 +9017,7 @@ GameObject:
   - component: {fileID: 1832432512}
   m_Layer: 0
   m_Name: CuttingBoard
-  m_TagString: Untagged
+  m_TagString: CuttingBoard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9192,6 +9192,7 @@ GameObject:
   - component: {fileID: 1851100221}
   - component: {fileID: 1851100220}
   - component: {fileID: 1851100219}
+  - component: {fileID: 1851100222}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -9247,6 +9248,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1851100222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1851100218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a00b87a64e0e674ca28076021229335, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1879221434
 GameObject:
   m_ObjectHideFlags: 0

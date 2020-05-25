@@ -12,12 +12,30 @@ public class FoodRequirement : Requirement
     public FoodRequirement prev;
     public Requirement cutted;
 
+    public FoodRequirement(foodType f)
+    {
+        pos = new List<Vector3>();
+        t = type.food;
+        foodT = f;
+        switch (f)
+        {
+            case foodType.lettuce:
+                getPos("Lettuce");
+                break;
+            case foodType.onion:
+                getPos("Onion");
+                break;
+            case foodType.tomato:
+                getPos("Tomato");
+                break;
+        }
+    }
+
+
     public void needCut()
     {
         cut = true;
-        FoodRequirement r = new FoodRequirement();
-        r.t = type.food;
-        r.foodT = foodT;
+        FoodRequirement r = new FoodRequirement(foodT);
         prev = r;
         Requirement r1 = new Requirement();
         r.t = type.cut;

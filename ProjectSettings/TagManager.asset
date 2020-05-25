@@ -7,6 +7,13 @@ TagManager:
   - Ground
   - Return
   - Delivery
+  - Lettuce
+  - Tomato
+  - Onion
+  - Plate
+  - Pan
+  - CuttingBoard
+  - Stove
   layers:
   - Default
   - TransparentFX

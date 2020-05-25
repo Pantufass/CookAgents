@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class Objective : Requirement
 {
-    public enum objective {salad, onionSoup, tomatoSoup}
+    public enum objective {salad, onionSoup, tomatoSoup,tomato, lettuce}
     public objective o;
 
     public List<Requirement> requirements;
 
     public Objective(objective ob)
     {
+        pos = new List<Vector3>();
         t = type.objective;
         o = ob;
         switch (o)
@@ -24,8 +25,44 @@ public class Objective : Requirement
             case objective.tomatoSoup:
                 objTomatoSoup();
                 break;
+            case objective.tomato:
+                objTomato();
+                break;
+            case objective.lettuce:
+                objLettuce();
+                break;
         }
         requirements = new List<Requirement>();
+    }
+
+    public Objective(Plate.State r)
+    {
+        requirements = new List<Requirement>();
+        pos = new List<Vector3>();
+        t = type.objective;
+        switch (r)
+        {
+            case Plate.State.onSoup:
+                objOnionSoup();
+                o = objective.onionSoup;
+                break;
+            case Plate.State.salad:
+                objSalad();
+                o = objective.salad;
+                break;
+            case Plate.State.tomSoup:
+                objTomatoSoup();
+                o = objective.tomatoSoup;
+                break;
+            case Plate.State.lettuce:
+                objLettuce();
+                o = objective.lettuce;
+                break;
+            case Plate.State.tomato:
+                objTomato();
+                o = objective.tomato;
+                break;
+        }
     }
     public override bool sucess()
     {
@@ -44,65 +81,65 @@ public class Objective : Requirement
 
     void objOnionSoup()
     {
-        Requirement r = new Requirement();
-        r.t = type.plate;
-        requirements.Add(r);
+        requirements.Add(new Requirement(type.plate));
 
-        Requirement r1 = new Requirement();
-        r1.t = type.pan;
-        requirements.Add(r1);
+        requirements.Add(new Requirement(type.pan));
 
 
         requirements.Add(addCut(FoodRequirement.foodType.onion));
         requirements.Add(addCut(FoodRequirement.foodType.onion));
         requirements.Add(addCut(FoodRequirement.foodType.onion));
 
-        Requirement r4 = new Requirement();
-        r4.t = type.boil;
-        requirements.Add(r4);
+        requirements.Add(new Requirement(type.boil));
+
+        requirements.Add(new Requirement(type.deliver));
 
     }
 
     FoodRequirement addCut(FoodRequirement.foodType f)
     {
-        FoodRequirement fr = new FoodRequirement();
-        fr.t = type.food;
-        fr.foodT = f;
+        FoodRequirement fr = new FoodRequirement(f);
         fr.needCut();
         return fr;
     }
 
     void objSalad()
     {
-        Requirement r = new Requirement();
-        r.t = type.plate;
-        requirements.Add(r);
+        requirements.Add(new Requirement(type.plate));
 
         requirements.Add(addCut(FoodRequirement.foodType.tomato));
         requirements.Add(addCut(FoodRequirement.foodType.lettuce));
 
-        Requirement r4 = new Requirement();
-        r4.t = type.boil;
-        requirements.Add(r4);
+        requirements.Add(new Requirement(type.deliver));
     }
 
     void objTomatoSoup()
     {
-        Requirement r = new Requirement();
-        r.t = type.plate;
-        requirements.Add(r);
+        requirements.Add(new Requirement(type.plate));
 
-        Requirement r1 = new Requirement();
-        r1.t = type.pan;
-        requirements.Add(r1);
+        requirements.Add(new Requirement(type.pan));
 
 
         requirements.Add(addCut(FoodRequirement.foodType.tomato));
         requirements.Add(addCut(FoodRequirement.foodType.tomato));
         requirements.Add(addCut(FoodRequirement.foodType.tomato));
 
-        Requirement r4 = new Requirement();
-        r4.t = type.boil;
-        requirements.Add(r4);
+        requirements.Add(new Requirement(type.boil));
+
+        requirements.Add(new Requirement(type.deliver));
     }
+
+    void objLettuce()
+    {
+        requirements.Add(new Requirement(type.plate));
+        requirements.Add(addCut(FoodRequirement.foodType.lettuce));
+        requirements.Add(new Requirement(type.deliver));
+    }
+    void objTomato()
+    {
+        requirements.Add(new Requirement(type.plate));
+        requirements.Add(addCut(FoodRequirement.foodType.tomato));
+        requirements.Add(new Requirement(type.deliver));
+    }
+
 }
