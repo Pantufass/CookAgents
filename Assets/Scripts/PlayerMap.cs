@@ -255,7 +255,9 @@ public class PlayerMap : MonoBehaviour
     {
         List<Action> possibleActions = new List<Action>();
 
-        for(int i = 0; i < options.Count; i++)
+        bool carrying = this.gameObject.transform.childCount > 0;
+
+        for (int i = 0; i < options.Count; i++)
         {
             switch (options[i])
             {
@@ -266,6 +268,7 @@ public class PlayerMap : MonoBehaviour
                         {
                             Action newAction = new Action("deliverOnionSoup", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), new Vector3());
                             possibleActions.Add(newAction);
+                            return possibleActions;
                         }
                     }
                     break;
@@ -273,7 +276,7 @@ public class PlayerMap : MonoBehaviour
                 case "getOnionSoup":
                     foreach(Transform soup in this.soups)
                     {
-                        if (!InPlayer(soup.parent))     //free
+                        if (!InPlayer(soup.parent) && !carrying)     //free
                         {
                             foreach(Transform p in this.plates) //verify that is in a plate or a pan, TODO
                             {
@@ -294,6 +297,15 @@ public class PlayerMap : MonoBehaviour
                             Action newAction = new Action("getCutOnion", new Vector3(onion.position.x, onion.position.y, -1), new Vector3());
                             possibleActions.Add(newAction);
                         }
+                        if (onion.gameObject.transform.parent.Equals(this.gameObject.transform))
+                        {
+                            foreach(Vector3 v in this.cuttingBoards)
+                            {
+                                Action newAction = new Action("deliverUncutedOnion", new Vector3(v.x, v.y, -1), new Vector3());
+                                possibleActions.Add(newAction);
+                            }
+                            return possibleActions;
+                        }
                     }
                     break;
 
@@ -308,7 +320,7 @@ public class PlayerMap : MonoBehaviour
                     }
                     foreach(Vector3 v in this.onionDisp)
                     {
-                        Action newAction = new Action("getOnion", new Vector3(v.x, v.y, -1), new Vector3());
+                        Action newAction = new Action("getNewOnion", new Vector3(v.x, v.y, -1), new Vector3());
                         possibleActions.Add(newAction);
                     }
 
@@ -332,6 +344,21 @@ public class PlayerMap : MonoBehaviour
             }
         }
         return false;
+    }
+
+
+    public void UpdateMap(Transform t)
+    {
+        switch (t.gameObject.name)
+        {
+            case "Onion(Clone)":
+                Debug.Log("Added an onion");
+                this.onions.Add(t);
+                break;
+                //TODO
+            default:
+                break;
+        }
     }
 
 }   

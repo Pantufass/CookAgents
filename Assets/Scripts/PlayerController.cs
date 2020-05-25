@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     private bool holding = false;
     private bool triggered = false;
 
+    public string facing = "up";
+
     public Counter c = null;
 
     private FoodRequests fr;
@@ -50,26 +52,27 @@ public class PlayerController : MonoBehaviour
         //move left
         if (commands[0])
         {
-            Debug.Log("Move Left");
+            up = RotateLeft(up);
             xValue -= 1;
         }
         //move right
         else if (commands[1])
         {
-            Debug.Log("Move Right");
+
+            up = RotateRight(up);
             xValue += 1;
         }
         //move up
         else if (commands[2])
         {
-            Debug.Log("Move UP");
+            up = RotateUp(up);
             yValue += 1;
         }
 
         //move down
         else if (commands[3])
         {
-            Debug.Log("Move Down");
+            up = RotateDown(up);
             yValue -= 1;
         }
 
@@ -156,4 +159,99 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
+    public void RotateTowards(Vector3 target)
+    {
+        Vector3 difference = this.gameObject.transform.position - target;
+        int up = 0;
+        if (difference.y > 0)
+        {
+            up = RotateDown(up);
+        }
+        else if(difference.y < 0)
+        {
+            up = RotateUp(up);
+        }
+        else if(difference.x > 0)
+        {
+            up = RotateLeft(up);
+        }
+        else if(difference.x < 0)
+        {
+            up = RotateRight(up);
+        }
+        transform.Rotate(up * new Vector3(0, 0, 1), 90f);
+        front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
+    }
+
+    private int RotateUp(int up)
+    {
+        if (facing.Equals("down"))
+        {
+            up += 2;
+        }
+        else if (facing.Equals("left"))
+        {
+            up -= 1;
+        }
+        else if (facing.Equals("right"))
+        {
+            up += 1;
+        }
+        facing = "up";
+        return up;
+    }
+
+    private int RotateDown(int up)
+    {
+        if (facing.Equals("up"))
+        {
+            up += 2;
+        }
+        else if (facing.Equals("left"))
+        {
+            up += 1;
+        }
+        else if (facing.Equals("right"))
+        {
+            up -= 1;
+        }
+        facing = "down";
+        return up;
+    }
+
+    private int RotateLeft(int up)
+    {
+        if (facing.Equals("up"))
+        {
+            up += 1;
+        }
+        else if (facing.Equals("right"))
+        {
+            up += 2;
+        }
+        else if (facing.Equals("down"))
+        {
+            up -= 1;
+        }
+        facing = "left";
+        return up;
+    }
+
+    private int RotateRight(int up)
+    {
+        if (facing.Equals("up"))
+        {
+            up -= 1;
+        }
+        else if (facing.Equals("left"))
+        {
+            up += 2;
+        }
+        else if (facing.Equals("down"))
+        {
+            up += 1;
+        }
+        facing = "right";
+        return up;
+    }
 }

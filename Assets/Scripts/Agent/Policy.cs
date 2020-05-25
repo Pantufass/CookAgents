@@ -11,7 +11,7 @@ public class Policy
     private TaskSet bestSet;
 
 
-    public List<AgentDecisionTask> RationaleDecision(List<AgentTasksInfo> agentTasks)
+    public List<AgentDecisionTask> RationalDecision(List<AgentTasksInfo> agentTasks)
     {
         bestSet = null;
 

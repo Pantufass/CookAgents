@@ -55,6 +55,7 @@ public class Agent : MonoBehaviour
 
         if(currentTask == null)
         {
+            Debug.Log("currentTask = null");
             int taskId = 0;
             Plate.State request = GetMostRecentRequest();
             List<Action> actions = GetPossibleActionsForRequest(request);
@@ -108,7 +109,7 @@ public class Agent : MonoBehaviour
 
     private void Decide()
     {
-        List<AgentDecisionTask> bestTasks = policy.RationaleDecision(this.iterationTasks);
+        List<AgentDecisionTask> bestTasks = policy.RationalDecision(this.iterationTasks);
         this.iterationTasks = new List<AgentTasksInfo>();
         foreach(AgentDecisionTask adt in bestTasks)
         {
@@ -163,22 +164,63 @@ public class Agent : MonoBehaviour
         }
         else
         {
-            Vector3 difference = this.gameObject.transform.position - currentTask.GetAction().GetGoal1(); 
+            controller.RotateTowards(currentTask.GetAction().GetGoal1());
+            
+            if(currentTask.GetAction().GetActionType().IndexOf("get") > -1)
+            {
+                PickUp();
 
-            Debug.Log("Rotation: " + this.gameObject.transform.rotation);
-            //rotate and use or pick up
+                if(currentTask.GetAction().GetActionType().IndexOf("getNew") > -1)
+                {
+                    foreach(Transform t in this.gameObject.transform)
+                    {
+                        UpdateMaps(t);
+                    }
+                }
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliver") > -1)
+            {
+                Use();
+            }
 
-            this.currentTask = null;
+                this.currentTask = null;
 
         }
 
+    }
+
+    private void PickUp()
+    {
+        List<bool> com = new List<bool>();
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(true);
+        com.Add(false);
+        controller.Act(com);
+    }
+
+    private void Use()
+    {
+        List<bool> com = new List<bool>();
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(false);
+        com.Add(true);
+        controller.Act(com);
     }
 
 
     private Plate.State GetMostRecentRequest()
     {
         Plate.State test = this.controller.LastRequest();
-        Debug.Log(test);
         return test;
 
     }
@@ -187,14 +229,19 @@ public class Agent : MonoBehaviour
     {
         List<string> options = requestConverter.GetConversion(request);
 
-        Debug.Log(options);
-
         return map.GetPossibleActions(options);
        
     }
 
 
-
+    private void UpdateMaps(Transform t)
+    {
+        this.map.UpdateMap(t);
+        foreach(GameObject g in otherPlayers)
+        {
+            g.GetComponent<PlayerMap>().UpdateMap(t);
+        }
+    }
 
     private void ReceiveAgentTasks(AgentTasksInfo tasks)
     {
