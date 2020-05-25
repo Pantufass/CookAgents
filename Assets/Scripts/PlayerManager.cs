@@ -31,7 +31,6 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
     }
 
     private void GetPositions()
@@ -58,7 +57,6 @@ public class PlayerManager : MonoBehaviour
 
             players.Add(player);
             player.GetComponent<Agent>().SetId(i + 1);
-            player.GetComponent<Agent>().StartMap();
         }
         for(int j = 0; j < players.Count; j++)
         {
@@ -67,6 +65,7 @@ public class PlayerManager : MonoBehaviour
                 if(j != h)
                 {
                     players[j].GetComponent<Agent>().AddOtherPlayer(players[h]);
+                    players[j].GetComponent<PlayerMap>().AddOtherPlayer(players[h]);
                 }
             }
         }

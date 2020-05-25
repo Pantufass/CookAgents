@@ -18,11 +18,14 @@ public class PlayerController : MonoBehaviour
 
     public Counter c = null;
 
+    private FoodRequests fr;
+
+
     private void Start()
     {
-        front = new Vector3(0,1,0);
+        this.front = new Vector3(0,1,0);
 
-        ground = GameObject.FindGameObjectWithTag("Ground");
+        this.ground = GameObject.FindGameObjectWithTag("Ground");
 
         foreach(Transform t in ground.transform)
         {
@@ -30,9 +33,11 @@ public class PlayerController : MonoBehaviour
         }
         col = gameObject.AddComponent<BoxCollider2D>();
         col.offset = front;
-        col.isTrigger = true;
+        //col.isTrigger = true;
         col.enabled = true;
         col.size = new Vector2(0.8f, 0.8f);
+
+        fr = FindObjectOfType<FoodRequests>();
     }
 
 
@@ -41,14 +46,32 @@ public class PlayerController : MonoBehaviour
         int xValue = 0, yValue = 0, up = 0;
 
 
+
         //move left
-        if (commands[0]) xValue -= 1;
+        if (commands[0])
+        {
+            Debug.Log("Move Left");
+            xValue -= 1;
+        }
         //move right
-        if (commands[1]) xValue += 1;
+        if (commands[1])
+        {
+            Debug.Log("Move Right");
+            xValue += 1;
+        }
         //move up
-        if (commands[2]) yValue += 1;
+        if (commands[2])
+        {
+            Debug.Log("Move UP");
+            yValue += 1;
+        }
+
         //move down
-        if (commands[3]) yValue -= 1;
+        if (commands[3])
+        {
+            Debug.Log("Move Down");
+            yValue -= 1;
+        }
 
         //rotate left
         if (commands[4]) up += 1;
@@ -98,13 +121,26 @@ public class PlayerController : MonoBehaviour
     {
         triggered = true;
         c = collision.gameObject.GetComponent<Counter>();
-        Debug.Log("WIEJFNMEWFEFWEFWE");
+        Debug.Log(c);
     }
 
-   
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        triggered = false;
+        c = null;
+    }
 
- 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
 
+        triggered = true;
+        c = collision.gameObject.GetComponent<Counter>();
+    }
+
+    public Plate.State LastRequest()
+    {
+        return fr.lastRequest();
+    }
 
     public bool holdItem(Item i)
     {

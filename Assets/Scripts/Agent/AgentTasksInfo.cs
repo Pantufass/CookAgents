@@ -26,4 +26,9 @@ public class AgentTasksInfo
     {
         return currentTask;
     }
+
+    public int GetId()
+    {
+        return id;
+    }
 }

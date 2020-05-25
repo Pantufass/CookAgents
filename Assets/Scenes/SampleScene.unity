@@ -2410,10 +2410,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefabs:
-  - {fileID: 288916074518035436, guid: 7392ef8fc675b8d4bb44458d39ff5683, type: 3}
-  - {fileID: 2194176001518230516, guid: a2da7b03815940b4a81255d339557f80, type: 3}
-  - {fileID: 894483715609803864, guid: de8222a30c286c4468103b2a97af839f, type: 3}
-  - {fileID: 5797693964951195606, guid: 12471c195725f0a40acd3ad92dc79abc, type: 3}
+  - {fileID: 4735702072131920703, guid: 7392ef8fc675b8d4bb44458d39ff5683, type: 3}
+  - {fileID: 1794718085526969949, guid: a2da7b03815940b4a81255d339557f80, type: 3}
+  - {fileID: 7036548183695229391, guid: de8222a30c286c4468103b2a97af839f, type: 3}
+  - {fileID: 7735300604030527822, guid: 12471c195725f0a40acd3ad92dc79abc, type: 3}
   ground: {fileID: 768800780}
 --- !u!4 &622971511
 Transform:
@@ -5684,7 +5684,7 @@ GameObject:
   - component: {fileID: 1214587748}
   m_Layer: 0
   m_Name: Delivery
-  m_TagString: Untagged
+  m_TagString: Delivery
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

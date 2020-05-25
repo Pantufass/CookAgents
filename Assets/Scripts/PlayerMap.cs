@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMap
+public class PlayerMap : MonoBehaviour
 {
 
     private bool DEBUG = true;
@@ -13,13 +13,41 @@ public class PlayerMap
 
     public GameObject ground;
 
+    public GameObject specials;
+
     private List<Vector3> positions = new List<Vector3>();
 
     private List<Vector3> intersections = new List<Vector3>();
 
-    public PlayerMap(GameObject ground)
+    private List<Vector3> stoves = new List<Vector3>();
+
+    private List<Vector3> onionDisp = new List<Vector3>();
+
+    private List<Vector3> cuttingBoards = new List<Vector3>();
+
+    private List<Transform> onions = new List<Transform>();
+
+    private List<Transform> tomatos = new List<Transform>();
+
+    private List<Transform> lettuce = new List<Transform>();
+
+    private List<Transform> pans = new List<Transform>();
+
+    private List<Transform> plates = new List<Transform>();
+
+    private List<Transform> soups = new List<Transform>();
+
+    private Transform delivery;
+
+    private Vector3 plateReturn;
+
+    void Start()
     {
-        this.ground = ground;
+        this.ground = GameObject.FindGameObjectWithTag("Ground");
+        this.specials = GameObject.Find("Specials");
+
+        RunSpecials();
+
         foreach (Transform t in ground.transform)
         {
             positions.Add(new Vector3(t.position.x, t.position.y, -1));
@@ -51,11 +79,43 @@ public class PlayerMap
         }
     }
 
+    private void RunSpecials()
+    {
+        foreach(Transform t in specials.transform)
+        {
+            switch (t.gameObject.name)
+            {
+                case "Stove":
+                    this.stoves.Add(new Vector3(t.position.x, t.position.y, -1));
+                    break;
+
+                case "OnionDisp":
+                    this.onionDisp.Add(new Vector3(t.position.x, t.position.y, -1));
+                    break;
+
+                case "CuttingBoard":
+                    this.cuttingBoards.Add(new Vector3(t.position.x, t.position.y, -1));
+                    break;
+
+                case "Delivery":
+                    this.delivery = t;
+                    break;
+
+                case "Return":
+                    this.plateReturn = new Vector3(t.position.x, t.position.y, -1);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
 
     public List<List<Vector3>> FindPossiblePaths(Vector3 start, Vector3 goal)
     {
         List<Vector3> walkablePositions = this.FindClosestWalkablePosition(goal);
-
+       
         List<List<Vector3>> allPossiblePaths = new List<List<Vector3>>();
 
         foreach(Vector3 w in walkablePositions)
@@ -75,7 +135,6 @@ public class PlayerMap
 
     private List<List<Vector3>> FindPaths(Vector3 start, Vector3 goal, List<Vector3> path, int wait)
     {
-
         if (start.Equals(goal))
         {
             path.Add(start);
@@ -101,7 +160,7 @@ public class PlayerMap
                     {
                         possiblePaths.Add(p);
                     }
-                }
+                }/*
                 //take this out if dont want them to wait in intersections
                 else if(ocurrences == 1 && intersections.Contains(start))   //means you just left an intersection and only passed in the intersection once
                 {
@@ -122,7 +181,7 @@ public class PlayerMap
                             possiblePaths.Add(p);
                         }
                     }
-                }
+                }*/  
             }
         }
         return possiblePaths;
@@ -173,7 +232,7 @@ public class PlayerMap
         float xDiference = Mathf.Abs(pos2.x - pos1.x);
         float yDiference = Mathf.Abs(pos2.y - pos1.y);
 
-        return !((xDiference + yDiference) > 1);
+        return (xDiference + yDiference) == 1;
     }
 
 
@@ -188,4 +247,91 @@ public class PlayerMap
     {
         otherPlayers.Add(player);
     }
+
+
+
+
+    public List<Action> GetPossibleActions(List<string> options)
+    {
+        List<Action> possibleActions = new List<Action>();
+
+        for(int i = 0; i < options.Count; i++)
+        {
+            switch (options[i])
+            {
+                case "deliverOnionSoup":
+                    foreach (Transform soup in this.soups)
+                    {
+                        if (soup.parent.parent.Equals(this.gameObject.transform) && soup.gameObject.GetComponent<Soup>().type() == Item.type.onion)   //player has it
+                        {
+                            Action newAction = new Action("deliverOnionSoup", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), new Vector3());
+                            possibleActions.Add(newAction);
+                        }
+                    }
+                    break;
+
+                case "getOnionSoup":
+                    foreach(Transform soup in this.soups)
+                    {
+                        if (!InPlayer(soup.parent))     //free
+                        {
+                            foreach(Transform p in this.plates) //verify that is in a plate or a pan, TODO
+                            {
+
+                            }
+                            Action newAction = new Action("getOnionSoup", new Vector3(soup.position.x, soup.position.y, -1), new Vector3());
+                            possibleActions.Add(newAction);
+                        }
+                    }
+                    break;
+
+                case "cutOnion":
+                    //TODO
+                    foreach(Transform onion in this.onions)
+                    {
+                        if(onion.gameObject.GetComponent<Food>().IsCut() && !InPlayer(onion))
+                        {
+                            Action newAction = new Action("getCutOnion", new Vector3(onion.position.x, onion.position.y, -1), new Vector3());
+                            possibleActions.Add(newAction);
+                        }
+                    }
+                    break;
+
+                case "getOnion":
+                    foreach(Transform onion in this.onions)
+                    {
+                        if (!onion.gameObject.GetComponent<Food>().IsCut() && !InPlayer(onion))     //exists but not cut and not in player possession
+                        {
+                            Action newAction = new Action("getOnion", new Vector3(onion.position.x, onion.position.y, -1), new Vector3());
+                            possibleActions.Add(newAction);
+                        }
+                    }
+                    foreach(Vector3 v in this.onionDisp)
+                    {
+                        Action newAction = new Action("getOnion", new Vector3(v.x, v.y, -1), new Vector3());
+                        possibleActions.Add(newAction);
+                    }
+
+                    break;
+
+                default:
+                    break;
+
+            }
+        }
+        return possibleActions;
+    }
+
+    private bool InPlayer(Transform t)
+    {
+        foreach (GameObject g in otherPlayers)
+        {
+            if (g.transform.Equals(t.parent))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }   

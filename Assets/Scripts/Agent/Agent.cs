@@ -12,76 +12,83 @@ public class Agent : MonoBehaviour
 
     private PlayerController controller;
 
+    private RequestToAction requestConverter;
+
     public GameObject ground;
 
     private PlayerMap map;
 
+    private Policy policy;
+
     private Task currentTask = null;
+
+    private bool once = false;
 
     // Start is called before the first frame update
     void Start()
     {
         controller = this.gameObject.GetComponent<PlayerController>();
+        map = this.gameObject.GetComponent<PlayerMap>();
+        requestConverter = new RequestToAction();
+        policy = new Policy();
     }
 
     // Update is called once per frame
     void Update()
     {
         Perceive();
-        Decide();
-        Act();
-    }
+        if (!once)
+        {
+            Perceive();
+            Debug.Log("Update");
+            Debug.Log(this.iterationTasks.Count);
+            Debug.Log(this.otherPlayers.Count);
+            Perceive();
 
-    private void FixedUpdate()
-    {
-        List<bool> com = new List<bool>();
-        com.Add(Input.GetKey(KeyCode.A));
-        com.Add(Input.GetKey(KeyCode.D));
-        com.Add(Input.GetKey(KeyCode.W));
-        com.Add(Input.GetKey(KeyCode.S));
-        com.Add(Input.GetKey(KeyCode.Q));
-        com.Add(Input.GetKey(KeyCode.E));
-        com.Add(Input.GetKey(KeyCode.X));
-        com.Add(Input.GetKey(KeyCode.Z));
-        controller.Act(com);
+            once = true;
+        }
     }
 
     private void Perceive()
-    {
-        Request request = GetMostRecentRequest();
-        List<Action> actions = GetPossibleActionsForRequest(request);
+    {   
+
         List<Task> possibleTasks = new List<Task>();
-        foreach (Action a in actions)
+
+        if(currentTask == null)
         {
-            List<Vector3> goal = a.GetGoal();
+            int taskId = 0;
+            Plate.State request = GetMostRecentRequest();
+            List<Action> actions = GetPossibleActionsForRequest(request);
 
-            List<List<Vector3>> allPossiblePaths = new List<List<Vector3>>();
-
-            foreach (Vector3 v in goal)
+            foreach (Action a in actions)
             {
-                List<List<Vector3>> possiblePaths = map.FindPossiblePaths(this.transform.position, v);
+                Debug.Log(a.GetActionType());
+                Debug.Log(a.GetGoal1());
+                Vector3 goal = a.GetGoal1();
+
+                List<List<Vector3>> possiblePaths = map.FindPossiblePaths(this.transform.position, goal);
 
                 foreach (List<Vector3> path in possiblePaths)
                 {
-                    allPossiblePaths.Add(path);
+                    Task possibleTask = new Task(this.gameObject, taskId++, a, path);
+                    possibleTasks.Add(possibleTask);
                 }
+
             }
-
-            Task possibleTask = new Task(a, allPossiblePaths);
-            possibleTasks.Add(possibleTask);
-
-
-
         }
+        else
+        {
+            possibleTasks.Add(currentTask);
+        }
+       
+        int lowestId = 1;
 
-        int highestId = otherPlayers.Count + 1;
-
-        if (id != highestId)
+        if (id != lowestId)
         {
             foreach(GameObject p in otherPlayers)
             {
                 Agent a = p.GetComponent<Agent>();
-                if(a.GetId() == highestId)
+                if(a.GetId() == lowestId)
                 {
                     a.ReceiveAgentTasks(new AgentTasksInfo(this, possibleTasks, currentTask));
                 }
@@ -90,31 +97,101 @@ public class Agent : MonoBehaviour
         else
         {
             iterationTasks.Add(new AgentTasksInfo(this, possibleTasks, currentTask));
+            if (iterationTasks.Count == otherPlayers.Count + 1)
+            {
+                Debug.Log("lets gooo");
+                Debug.Log(iterationTasks.Count);
+                Decide();
+            }
         }
 
     }
 
     private void Decide()
     {
+        List<AgentDecisionTask> bestTasks = policy.RationaleDecision(this.iterationTasks);
+        this.iterationTasks = new List<AgentTasksInfo>();
+        foreach(AgentDecisionTask adt in bestTasks)
+        {
+            if(adt.GetId() != this.GetId())
+            {
+                foreach(GameObject g in otherPlayers)
+                {
+                    Agent a = g.GetComponent<Agent>();
+                    if (a.GetId() == adt.GetId())
+                    {
+                        a.Act(adt.GetTask());
+                    }
+                }
+            }
+            else
+            {
+                this.Act(adt.GetTask());
+            }
+        }
+    }
+
+    private void Act(Task task)
+    {
+        if(currentTask == null)
+        {
+            currentTask = task;
+        }
+        Vector3 position = this.gameObject.transform.position;
+
+        List<Vector3> path = currentTask.GetPath();
+
+        Debug.Log("Path size: " + path.Count);
+
+        if(path.Count > 1)
+        {
+            //currentPos = path[0]
+            Vector3 nextPos = path[1];
+            path.RemoveAt(0);
+            Vector3 walk = nextPos - position;
+
+            List<bool> com = new List<bool>();
+            com.Add(walk.x == -1);
+            com.Add(walk.x == 1);
+            com.Add(walk.y == 1);
+            com.Add(walk.y == -1);
+            com.Add(Input.GetKey(KeyCode.Q));
+            com.Add(Input.GetKey(KeyCode.E));
+            com.Add(Input.GetKey(KeyCode.X));
+            com.Add(Input.GetKey(KeyCode.Z));
+            controller.Act(com);
+
+        }
+        else
+        {
+            /*Vector3 difference = this.gameObject.transform.position - currentTask.GetAction().GetGoal1(); 
+
+            Debug.Log("Rotation: " + this.gameObject.transform.rotation);
+            //rotate and use or pick up
+
+            this.currentTask = null;*/
+
+        }
 
     }
 
-    private void Act()
+
+    private Plate.State GetMostRecentRequest()
     {
+        Plate.State test = this.controller.LastRequest();
+        Debug.Log(test);
+        return test;
 
     }
 
-
-    private Request GetMostRecentRequest()
+    private List<Action> GetPossibleActionsForRequest(Plate.State request)
     {
-        //TODO
-        return null;
-    }
+        List<string> options = requestConverter.GetConversion(request);
 
-    private List<Action> GetPossibleActionsForRequest(Request request)
-    {
-        //TODO
-        return new List<Action>(); 
+        Debug.Log(options);
+
+        return map.GetPossibleActions(options);
+       
     }
 
 
@@ -123,21 +200,16 @@ public class Agent : MonoBehaviour
     private void ReceiveAgentTasks(AgentTasksInfo tasks)
     {
         iterationTasks.Add(tasks);
+        Debug.Log("Size: " + iterationTasks.Count);
         if(iterationTasks.Count == otherPlayers.Count + 1)
         {
             Debug.Log("lets gooo");
             Decide();
         }
     }
-    public void StartMap()
-    {
-        ground = GameObject.FindGameObjectWithTag("Ground");
-        map = new PlayerMap(ground);
-    }
     public void AddOtherPlayer(GameObject player)
     {
         otherPlayers.Add(player);
-        map.AddOtherPlayer(player);
     }
 
     public void SetId(int id)
@@ -148,5 +220,15 @@ public class Agent : MonoBehaviour
     public int GetId()
     {
         return this.id;
+    }
+
+    private void PrintPath(List<Vector3> path)
+    {
+        string print = "";
+        foreach(Vector3 v in path)
+        {
+            print += v + " -> " ;
+        }
+        Debug.Log(print);
     }
 }

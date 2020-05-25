@@ -7,7 +7,7 @@ public class Soup : MonoBehaviour, PlatableFood
 
     private List<Food> cooking;
 
-    private bool done;
+    public bool done;
     public bool canBoil()
     {
         return cooking.Count == 3;

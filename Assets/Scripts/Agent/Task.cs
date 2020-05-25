@@ -4,18 +4,20 @@ using UnityEngine;
 
 public class Task
 {
+    private GameObject agent;
+
+    private int taskId;
 
     private Action action;
 
-    private List<List<Vector3>> possiblePaths;
-
-    private List<Vector3> chosenPath;
+    private List<Vector3> path;
     
-
-    public Task(Action action, List<List<Vector3>> possiblePaths)
+    public Task(GameObject agent, int taskId, Action action, List<Vector3> path)
     {
+        this.agent = agent;
+        this.taskId = taskId;
         this.action = action;
-        this.possiblePaths = possiblePaths;
+        this.path = path;
     }
 
     public Action GetAction()
@@ -23,14 +25,15 @@ public class Task
         return this.action;
     }
 
-    public List<List<Vector3>> GetPossiblePaths()
+    public List<Vector3> GetPath()
     {
-        return this.possiblePaths;
+        return this.path;
     }
 
-    public List<Vector3> GetChosenPath()
+    public int GetId()
     {
-        return this.chosenPath;
+        return this.taskId;
     }
+
 
 }

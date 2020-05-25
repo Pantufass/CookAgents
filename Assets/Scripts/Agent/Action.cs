@@ -6,19 +6,27 @@ public class Action
 {
 
     private string actionType;
-    private List<Vector3> goal;
+    private Vector3 goal1;
+    private Vector3 goal2;
 
-    //private List<Vector3> secondGoal;
-
-    public Action(string action)
+    public Action(string actionType, Vector3 goal1, Vector3 goal2)
     {
-        this.actionType = action;
+        this.actionType = actionType;
+        this.goal1 = goal1;
+        this.goal2 = goal2;
     }
 
-    public List<Vector3> GetGoal()
+
+    public Vector3 GetGoal1()
     {
-        return this.goal;
+        return this.goal1;
     }
+
+    public Vector3 GetGoal2()
+    {
+        return this.goal2;
+    }
+
     public string GetActionType()
     {
         return this.actionType;

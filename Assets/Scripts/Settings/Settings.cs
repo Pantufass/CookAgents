@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class Settings : MonoBehaviour
 {
-    public int speed = 2;
+    public int speed = 1;
 
     void Start()
     {
-        Time.fixedDeltaTime = 0.6f/speed;
+        Application.targetFrameRate = speed;
         Physics2D.gravity = Vector2.zero;
     }
 

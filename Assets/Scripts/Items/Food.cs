@@ -12,4 +12,9 @@ public class Food : Item, PlatableFood
         cut = true;
         this.GetComponent<SpriteRenderer>().sprite = cutSprite;
     }
+
+    public bool IsCut()
+    {
+        return this.cut;
+    }
 }
