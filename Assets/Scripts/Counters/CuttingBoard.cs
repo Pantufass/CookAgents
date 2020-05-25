@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CutttingBoard : Counter
+public class CuttingBoard : Counter
 {
 
     public override bool use(GameObject player)

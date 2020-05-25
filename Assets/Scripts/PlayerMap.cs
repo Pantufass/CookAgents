@@ -23,7 +23,7 @@ public class PlayerMap : MonoBehaviour
 
     private List<Vector3> onionDisp = new List<Vector3>();
 
-    private List<Vector3> cuttingBoards = new List<Vector3>();
+    private List<Transform> cuttingBoards = new List<Transform>();
 
     private List<Transform> onions = new List<Transform>();
 
@@ -77,6 +77,13 @@ public class PlayerMap : MonoBehaviour
                 } 
             }
         }
+
+        for(int i = 1; i < 4; i++)
+        {
+            GameObject pan = GameObject.Find("Pan" + i);
+            this.pans.Add(pan.transform);
+        }
+
     }
 
     private void RunSpecials()
@@ -94,7 +101,7 @@ public class PlayerMap : MonoBehaviour
                     break;
 
                 case "CuttingBoard":
-                    this.cuttingBoards.Add(new Vector3(t.position.x, t.position.y, -1));
+                    this.cuttingBoards.Add(t);
                     break;
 
                 case "Delivery":
@@ -152,7 +159,7 @@ public class PlayerMap : MonoBehaviour
                 if(ocurrences == 0)        // path where it is coming from
                 {
                     int newWaitTime = 5;
-                    if (intersections.Contains(v)) { newWaitTime = 0; }
+                    if (!intersections.Contains(v)) { newWaitTime = 0; }
                     List<Vector3> pathCopy = new List<Vector3>(path);
                     pathCopy.Add(start);
                     List<List<Vector3>> pathsReturned = FindPaths(v, goal, pathCopy, newWaitTime);
@@ -287,21 +294,72 @@ public class PlayerMap : MonoBehaviour
                         }
                     }
                     break;
+                case "deliverCutedInSoupOnion":
+                    if (carrying)
+                    {
+                        foreach(Transform onion in this.onions)
+                        {
+                            if(onion.gameObject.GetComponent<Food>().IsCut() && InMyPossession(onion)){
+                                Debug.Log("Im trying");
+                                foreach(Transform pan in this.pans)
+                                {
+                                    Debug.Log("I entered pans world");
+                                    Soup soup = pan.GetComponent<Pan>().soup;
+                                    if ((soup.type() == Item.type.onion || soup.type() == Item.type.none) && !soup.isDone())
+                                    {
+                                        Action newAction = new Action("deliverCutedInSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), new Vector3());
+                                        possibleActions.Add(newAction);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
 
+                case "getCutedOnion":
+                    if (!carrying)
+                    {
+                        foreach(Transform board in this.cuttingBoards)
+                        {
+                            GameObject a = null;
+                            if (board.gameObject.GetComponent<CuttingBoard>().onTop != null)
+                            {
+                                a = board.gameObject.GetComponent<CuttingBoard>().onTop.gameObject;
+                                if (a.name == "Onion(Clone)" && a.GetComponent<Food>().IsCut())
+                                {
+                                    Action newAction = new Action("getCutedOnion", new Vector3(board.position.x, board.position.y, -1), new Vector3());
+                                    possibleActions.Add(newAction);
+                                }
+                            }
+                        }
+                    }
+                    break;
                 case "cutOnion":
+                    if (!carrying)
+                    {
+                        foreach(Transform c in this.cuttingBoards)
+                        {
+                            foreach(Transform food in c)
+                            {
+                                if(food.gameObject.name == "Onion(Clone)" && food.gameObject.GetComponent<Food>().IsCut())
+                                {
+                                    Action newAction = new Action("useCuttingBoard", new Vector3(c.position.x, c.position.y, -1), new Vector3());
+                                    possibleActions.Add(newAction);
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case "deliverUncutedOnion":
                     //TODO
                     foreach(Transform onion in this.onions)
                     {
-                        if(onion.gameObject.GetComponent<Food>().IsCut() && !InPlayer(onion))
+                        if (carrying && InMyPossession(onion) && !onion.gameObject.GetComponent<Food>().IsCut())
                         {
-                            Action newAction = new Action("getCutOnion", new Vector3(onion.position.x, onion.position.y, -1), new Vector3());
-                            possibleActions.Add(newAction);
-                        }
-                        if (onion.gameObject.transform.parent.Equals(this.gameObject.transform))
-                        {
-                            foreach(Vector3 v in this.cuttingBoards)
+                            foreach(Transform c in this.cuttingBoards)
                             {
-                                Action newAction = new Action("deliverUncutedOnion", new Vector3(v.x, v.y, -1), new Vector3());
+                                Action newAction = new Action("deliverUncutedOnion", new Vector3(c.position.x, c.position.y, -1), new Vector3());
                                 possibleActions.Add(newAction);
                             }
                             return possibleActions;
@@ -310,20 +368,22 @@ public class PlayerMap : MonoBehaviour
                     break;
 
                 case "getOnion":
-                    foreach(Transform onion in this.onions)
+                    if (!carrying)
                     {
-                        if (!onion.gameObject.GetComponent<Food>().IsCut() && !InPlayer(onion))     //exists but not cut and not in player possession
+                        foreach (Transform onion in this.onions)
                         {
-                            Action newAction = new Action("getOnion", new Vector3(onion.position.x, onion.position.y, -1), new Vector3());
+                            if (!onion.gameObject.GetComponent<Food>().IsCut() && !InPlayer(onion))     //exists but not cut and not in player possession
+                            {
+                                Action newAction = new Action("getOnion", new Vector3(onion.position.x, onion.position.y, -1), new Vector3());
+                                possibleActions.Add(newAction);
+                            }
+                        }
+                        foreach (Vector3 v in this.onionDisp)
+                        {
+                            Action newAction = new Action("getNewOnion", new Vector3(v.x, v.y, -1), new Vector3());
                             possibleActions.Add(newAction);
                         }
                     }
-                    foreach(Vector3 v in this.onionDisp)
-                    {
-                        Action newAction = new Action("getNewOnion", new Vector3(v.x, v.y, -1), new Vector3());
-                        possibleActions.Add(newAction);
-                    }
-
                     break;
 
                 default:
@@ -338,7 +398,22 @@ public class PlayerMap : MonoBehaviour
     {
         foreach (GameObject g in otherPlayers)
         {
-            if (g.transform.Equals(t.parent))
+            foreach(Transform a in g.transform)
+            {
+                if (a.Equals(t))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private bool InMyPossession(Transform t)
+    {
+        foreach(Transform a in this.gameObject.transform)
+        {
+            if (a.Equals(t))
             {
                 return true;
             }
@@ -356,6 +431,20 @@ public class PlayerMap : MonoBehaviour
                 this.onions.Add(t);
                 break;
                 //TODO
+            default:
+                break;
+        }
+    }
+
+    public void DeleteFromMap(Transform t)
+    {
+        switch (t.gameObject.name)
+        {
+            case "Onion(Clone)":
+                Debug.Log("Removed an onion");
+                this.onions.Remove(t);
+                break;
+            //TODO
             default:
                 break;
         }

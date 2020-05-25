@@ -24,6 +24,8 @@ public class Agent : MonoBehaviour
 
     private bool once = false;
 
+    private int delay = 2;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,16 +38,16 @@ public class Agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Perceive();
-        if (!once)
+        if(delay > 0)
         {
-            Debug.Log("Update");
-            Debug.Log(this.iterationTasks.Count);
-            Debug.Log(this.otherPlayers.Count);
-            Perceive();
-
-            once = true;
+            delay--;
         }
+        else
+        {
+            Perceive();
+            delay = 2;
+        }
+        
     }
 
     private void Perceive()
@@ -62,8 +64,7 @@ public class Agent : MonoBehaviour
 
             foreach (Action a in actions)
             {
-                Debug.Log(a.GetActionType());
-                Debug.Log(a.GetGoal1());
+
                 Vector3 goal = a.GetGoal1();
 
                 List<List<Vector3>> possiblePaths = map.FindPossiblePaths(this.transform.position, goal);
@@ -110,6 +111,7 @@ public class Agent : MonoBehaviour
     private void Decide()
     {
         List<AgentDecisionTask> bestTasks = policy.RationalDecision(this.iterationTasks);
+        Debug.Log("BestTask :" + bestTasks);
         this.iterationTasks = new List<AgentTasksInfo>();
         foreach(AgentDecisionTask adt in bestTasks)
         {
@@ -133,6 +135,7 @@ public class Agent : MonoBehaviour
 
     private void Act(Task task)
     {
+        Debug.Log("Agent: " + id + "   Doing: " + task.GetAction().GetActionType());
         if(currentTask == null)
         {
             currentTask = task;
@@ -141,32 +144,38 @@ public class Agent : MonoBehaviour
 
         List<Vector3> path = currentTask.GetPath();
 
-        Debug.Log("Path size: " + path.Count);
 
         if(path.Count > 1)
         {
             //currentPos = path[0]
             Vector3 nextPos = path[1];
-            path.RemoveAt(0);
-            Vector3 walk = nextPos - position;
+            if (!PlayerInThatPosition(nextPos))
+            {
+                path.RemoveAt(0);
+                Vector3 walk = nextPos - position;
 
-            List<bool> com = new List<bool>();
-            com.Add(walk.x == -1);
-            com.Add(walk.x == 1);
-            com.Add(walk.y == 1);
-            com.Add(walk.y == -1);
-            com.Add(Input.GetKey(KeyCode.Q));
-            com.Add(Input.GetKey(KeyCode.E));
-            com.Add(Input.GetKey(KeyCode.X));
-            com.Add(Input.GetKey(KeyCode.Z));
-            controller.Act(com);
+                List<bool> com = new List<bool>();
+                com.Add(walk.x == -1);
+                com.Add(walk.x == 1);
+                com.Add(walk.y == 1);
+                com.Add(walk.y == -1);
+                com.Add(Input.GetKey(KeyCode.Q));
+                com.Add(Input.GetKey(KeyCode.E));
+                com.Add(Input.GetKey(KeyCode.X));
+                com.Add(Input.GetKey(KeyCode.Z));
+                controller.Act(com);
+            }
 
         }
         else
         {
             controller.RotateTowards(currentTask.GetAction().GetGoal1());
-            
-            if(currentTask.GetAction().GetActionType().IndexOf("get") > -1)
+
+            if (currentTask.GetAction().GetActionType().Equals("getCutedOnion"))
+            {
+                Use();
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("get") > -1)
             {
                 PickUp();
 
@@ -178,15 +187,38 @@ public class Agent : MonoBehaviour
                     }
                 }
             }
-            else if(currentTask.GetAction().GetActionType().IndexOf("deliver") > -1)
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliverCutedInSoup") > -1)
+            {
+                Transform carrying = null;
+                foreach(Transform t in this.gameObject.transform)
+                {
+                    carrying = t;
+                    break;
+                }
+                Use();
+                DeleteFromMaps(carrying);
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliver") > -1 || currentTask.GetAction().GetActionType().IndexOf("use") > -1)
             {
                 Use();
             }
 
-                this.currentTask = null;
+            this.currentTask = null;
 
         }
 
+    }
+
+    private bool PlayerInThatPosition(Vector3 v)
+    {
+        foreach(GameObject g in otherPlayers)
+        {
+            if (g.transform.position.Equals(v))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void PickUp()
@@ -243,13 +275,20 @@ public class Agent : MonoBehaviour
         }
     }
 
+    private void DeleteFromMaps(Transform t)
+    {
+        this.map.DeleteFromMap(t);
+        foreach (GameObject g in otherPlayers)
+        {
+            g.GetComponent<PlayerMap>().DeleteFromMap(t);
+        }
+    }
+
     private void ReceiveAgentTasks(AgentTasksInfo tasks)
     {
         iterationTasks.Add(tasks);
-        Debug.Log("Size: " + iterationTasks.Count);
         if(iterationTasks.Count == otherPlayers.Count + 1)
         {
-            Debug.Log("lets gooo");
             Decide();
         }
     }

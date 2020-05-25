@@ -8,7 +8,7 @@ public class RequestToAction
 
     public RequestToAction()
     {
-        conversion.Add(Plate.State.onSoup, new List<string>(new string[] { "deliverOnionSoup", "getOnionSoup", "cutOnion", "getOnion" })); 
+        conversion.Add(Plate.State.onSoup, new List<string>(new string[] { "deliverOnionSoup", "getOnionSoup", "deliverCutedInSoupOnion", "getCutedOnion", "cutOnion","deliverUncutedOnion", "getOnion" })); 
     }
 
     public List<string> GetConversion(Plate.State state)

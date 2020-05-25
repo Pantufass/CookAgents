@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
         }
         col = gameObject.AddComponent<BoxCollider2D>();
         col.offset = front;
-        //col.isTrigger = true;
+        col.isTrigger = true;
         col.enabled = true;
         col.size = new Vector2(0.8f, 0.8f);
 
@@ -52,19 +52,21 @@ public class PlayerController : MonoBehaviour
         //move left
         if (commands[0])
         {
+            Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING LEFT");
             up = RotateLeft(up);
             xValue -= 1;
         }
         //move right
         else if (commands[1])
         {
-
+            Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING RIGHT");
             up = RotateRight(up);
             xValue += 1;
         }
         //move up
         else if (commands[2])
         {
+            Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING UP");
             up = RotateUp(up);
             yValue += 1;
         }
@@ -72,6 +74,7 @@ public class PlayerController : MonoBehaviour
         //move down
         else if (commands[3])
         {
+            Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  MOVING DOWN");
             up = RotateDown(up);
             yValue -= 1;
         }
@@ -185,6 +188,7 @@ public class PlayerController : MonoBehaviour
 
     private int RotateUp(int up)
     {
+        Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating UP");
         if (facing.Equals("down"))
         {
             up += 2;
@@ -203,9 +207,10 @@ public class PlayerController : MonoBehaviour
 
     private int RotateDown(int up)
     {
+        Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating DOWN");
         if (facing.Equals("up"))
         {
-            up += 2;
+            up -= 2;
         }
         else if (facing.Equals("left"))
         {
@@ -221,6 +226,7 @@ public class PlayerController : MonoBehaviour
 
     private int RotateLeft(int up)
     {
+        Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating LEFT");
         if (facing.Equals("up"))
         {
             up += 1;
@@ -239,6 +245,7 @@ public class PlayerController : MonoBehaviour
 
     private int RotateRight(int up)
     {
+        Debug.Log("Agent " + this.GetComponent<Agent>().GetId() + "  Rotating RIGHT");
         if (facing.Equals("up"))
         {
             up -= 1;

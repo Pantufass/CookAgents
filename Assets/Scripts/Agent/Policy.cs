@@ -7,6 +7,7 @@ public class Policy
 
     private readonly int colisionPenalty = 100;
     private readonly int concurrencyPenalty = 5;
+    private readonly int bonusForProximity = 10;
 
     private TaskSet bestSet;
 
@@ -28,6 +29,12 @@ public class Policy
 
         if(bestSet == null)
         {
+            Debug.Log("Null best set");
+            Debug.Log("Size: " + agentTasks.Count);
+            foreach(AgentTasksInfo a in agentTasks)
+            {
+                Debug.Log(a.GetIterationTasks().Count);
+            }
             return null;
         }
 
@@ -110,7 +117,13 @@ public class Policy
         List<Task> tasks = set.GetSet();
         for(int i = 0; i < tasks.Count - 1; i++)
         {
-            cost += tasks[i].GetPath().Count;
+            int size = tasks[i].GetPath().Count;
+            cost += size;
+
+            if(size == 1)
+            {
+                cost -= this.bonusForProximity;
+            }
 
             for(int j = i + 1; j < tasks.Count; j++)
             {
