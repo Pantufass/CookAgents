@@ -5,7 +5,7 @@ using UnityEngine;
 public class Policy
 {
 
-    private readonly int colisionPenalty = 200;
+    private readonly int collisionPenalty = 1;
     private readonly int concurrencyPenalty = 50;
     private readonly int bonusForProximity = 50;
     private readonly int priorityPenalty = 2;
@@ -131,7 +131,7 @@ public class Policy
             {
                 
                 if(ExistsCollision(tasks[i].GetPath(), tasks[j].GetPath())){
-                    cost += this.colisionPenalty;
+                    cost += this.collisionPenalty;
                 }
                 if (tasks[i].GetAction().GetActionType().Equals(tasks[j].GetAction().GetActionType()))
                 {

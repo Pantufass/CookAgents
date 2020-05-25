@@ -30,6 +30,8 @@ public class Agent : MonoBehaviour
 
     private bool dropCarrying = false;
 
+    private Vector3 blacklist = new Vector3();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -69,6 +71,11 @@ public class Agent : MonoBehaviour
                 {
 
                     Vector3 goal = a.GetGoal1();
+                    if(goal == blacklist)
+                    {
+                        blacklist = new Vector3();
+                        continue;
+                    }
 
                     List<List<Vector3>> possiblePaths = map.FindPossiblePaths(this.transform.position, goal);
 
@@ -77,13 +84,12 @@ public class Agent : MonoBehaviour
                         Task possibleTask = new Task(this.gameObject, i, a, path);
                         possibleTasks.Add(possibleTask);
                     }
-
                 }
             }
         }
         else if (dropCarrying)      //task he was performing is over and he has something related in hands 
         {
-            Debug.Log("DROPING SOMETHING");
+            Debug.Log("Agent: " + id + " DROPING SOMETHING");
             dropCarrying = false;
             List<Action> dropActions = map.GetPossibleDropActions();
 
@@ -208,6 +214,7 @@ public class Agent : MonoBehaviour
                     if (stoped)
                     {
                         Debug.Log("Agent: " + this.id + " cancelling task");
+                        blacklist = currentTask.GetAction().GetGoal1();
                         currentTask = null;
                     }
                     else
@@ -225,7 +232,11 @@ public class Agent : MonoBehaviour
             if (currentTask.GetAction().GetActionType().Equals("drop"))
             {
                 Debug.Log("Agent: " + this.id + " dropping  item");
-                Use();
+                PickUp();
+                if(transform.childCount > 0)
+                {
+                    PickUp();
+                }
                 this.currentTask = null;
             }
             else if (currentTask.GetAction().GetActionType().Equals("empty"))
@@ -363,6 +374,7 @@ public class Agent : MonoBehaviour
             currentTask = null;
             if(this.transform.childCount > 0)
             {
+                Debug.Log("Agent: " + this.id + " Have child to drop");
                 dropCarrying = true;
             }
         }

@@ -52,6 +52,11 @@ public class PlayerMap : MonoBehaviour
     private Vector3 plateReturn;
 
 
+    private readonly int actionTypeImportance = 2;
+
+    private readonly int requestImportance = 10;
+
+
     private List<AgentDecisionTask> bestTasks;
 
     void Start()
@@ -316,9 +321,9 @@ public class PlayerMap : MonoBehaviour
 
         int i = 0;
 
-        for (i = 0; i < 2 *options.Count; i+=2)
+        for (i = 0; i < options.Count; i++)
         {
-            switch (options[i/2])
+            switch (options[i])
             {
 
                 case "deliverSoupOnion":
@@ -469,7 +474,7 @@ public class PlayerMap : MonoBehaviour
                         {
                             foreach(Transform c in this.cuttingBoards)
                             {
-                                if (true)
+                                if (!c.gameObject.GetComponent<CuttingBoard>().hasItem)
                                 {
                                     Debug.Log("Agent: " + this.gameObject.GetComponent<Agent>().GetId() + "  trying to deliver uncuted onion");
                                     Action newAction = new Action("deliverUncutedOnion", new Vector3(c.position.x, c.position.y, -1), c, i + requestPriority * 10);
@@ -736,6 +741,12 @@ public class PlayerMap : MonoBehaviour
             possibleActions.Add(newAction);
         }
         return possibleActions;
+    }
+
+    private void AddAction(List<Action> possibleActions, string type, Vector3 v, Transform t, int index, int requestIndex)
+    {
+        Action newAction = new Action(type, v, t,this.actionTypeImportance * index + this.requestImportance * 10);
+        possibleActions.Add(newAction);
     }
 
     public List<Action> GetPossibleDropActions()

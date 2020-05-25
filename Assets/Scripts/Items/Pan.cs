@@ -27,6 +27,7 @@ public class Pan : Recipient
         GameObject o = Instantiate(soup.gameObject);
         soup = o.GetComponent<Soup>();
         sp.sprite = empty;
+        soup.done = false;
     }
 
     public override bool addFood(GameObject o)

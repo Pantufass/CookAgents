@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
 
     public Counter c = null;
 
-    private FoodRequests fr;
+    private FoodRequests fr;    // change location
 
     private Quaternion Left = new Quaternion(); 
 
