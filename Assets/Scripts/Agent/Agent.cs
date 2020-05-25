@@ -163,12 +163,12 @@ public class Agent : MonoBehaviour
         }
         else
         {
-            /*Vector3 difference = this.gameObject.transform.position - currentTask.GetAction().GetGoal1(); 
+            Vector3 difference = this.gameObject.transform.position - currentTask.GetAction().GetGoal1(); 
 
             Debug.Log("Rotation: " + this.gameObject.transform.rotation);
             //rotate and use or pick up
 
-            this.currentTask = null;*/
+            this.currentTask = null;
 
         }
 

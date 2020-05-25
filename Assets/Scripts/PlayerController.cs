@@ -54,20 +54,20 @@ public class PlayerController : MonoBehaviour
             xValue -= 1;
         }
         //move right
-        if (commands[1])
+        else if (commands[1])
         {
             Debug.Log("Move Right");
             xValue += 1;
         }
         //move up
-        if (commands[2])
+        else if (commands[2])
         {
             Debug.Log("Move UP");
             yValue += 1;
         }
 
         //move down
-        if (commands[3])
+        else if (commands[3])
         {
             Debug.Log("Move Down");
             yValue -= 1;
