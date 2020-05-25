@@ -7,7 +7,7 @@ public class Policy
 
     private readonly int colisionPenalty = 200;
     private readonly int concurrencyPenalty = 50;
-    private readonly int bonusForProximity = 10;
+    private readonly int bonusForProximity = 50;
     private readonly int priorityPenalty = 2;
 
     private TaskSet bestSet;
@@ -146,6 +146,10 @@ public class Policy
 
     private bool ExistsCollision(List<Vector3> path1, List<Vector3> path2)
     {
+        if(path1.Count == 0 || path2.Count == 0)
+        {
+            return false;
+        }
         int index1 = 0;
         int index2 = 0;
         int size1 = path1.Count;

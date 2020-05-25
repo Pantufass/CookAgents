@@ -153,9 +153,9 @@ public class PlayerController : MonoBehaviour
         c = collision.gameObject.GetComponent<Counter>();
     }
 
-    public Plate.State LastRequest()
+    public List<Plate.State> LastRequest()
     {
-        return fr.lastRequest();
+        return fr.last2Request();
     }
 
     public bool holdItem(Item i)

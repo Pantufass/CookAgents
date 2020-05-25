@@ -15,6 +15,10 @@ public class PlayerMap : MonoBehaviour
 
     public GameObject specials;
 
+    public GameObject balcony;
+
+    public List<Transform> usableBalcony = new List<Transform>();
+
     private List<List<Vector3>> crossing = new List<List<Vector3>>();
 
     private List<Vector3> center = new List<Vector3>();
@@ -54,6 +58,7 @@ public class PlayerMap : MonoBehaviour
     {
         this.ground = GameObject.FindGameObjectWithTag("Ground");
         this.specials = GameObject.Find("Specials");
+        this.balcony = GameObject.Find("Balcony");
 
         RunSpecials();
 
@@ -61,8 +66,15 @@ public class PlayerMap : MonoBehaviour
         {
             positions.Add(new Vector3(t.position.x, t.position.y, -1));
         }
+        foreach (Transform t in balcony.transform)
+        {
+            if(!t.gameObject.name.Equals("Corner") && !t.gameObject.name.Equals("Center"))
+            {
+                this.usableBalcony.Add(t);
+            }
+        }
 
-        foreach(Vector3 v in positions)
+        foreach (Vector3 v in positions)
         {
             List<Vector3> temp = new List<Vector3>();
             foreach(Vector3 t in positions)
@@ -295,17 +307,18 @@ public class PlayerMap : MonoBehaviour
 
 
 
-    public List<Action> GetPossibleActions(List<string> options)
+    public List<Action> GetPossibleActions(List<string> options, int requestPriority)
     {
+        Debug.Log("Get possible Actions");
         List<Action> possibleActions = new List<Action>();
 
         bool carrying = this.gameObject.transform.childCount > 0;
 
         int i = 0;
 
-        for (i = 0; i < options.Count; i++)
+        for (i = 0; i < 2 *options.Count; i+=2)
         {
-            switch (options[i])
+            switch (options[i/2])
             {
 
                 case "deliverSoupOnion":
@@ -313,7 +326,7 @@ public class PlayerMap : MonoBehaviour
                     {
                         if(this.plates.Contains(WhatImCarrying()) && WhatImCarrying().gameObject.GetComponent<Plate>().GetState() == Plate.State.onSoup)
                         {
-                            Action newAction = new Action("deliverSoupOnion", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), this.delivery, i);
+                            Action newAction = new Action("deliverSoupOnion", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), this.delivery, i + requestPriority * 10);
                             possibleActions.Add(newAction);
                         }
                     }
@@ -325,7 +338,7 @@ public class PlayerMap : MonoBehaviour
                         {
                             if(plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.onSoup && !InPlayer(plate))
                             {
-                                Action newAction = new Action("getPlateSoupOnion", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                Action newAction = new Action("getPlateSoupOnion", new Vector3(plate.position.x, plate.position.y, -1), plate, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
                         }
@@ -340,7 +353,7 @@ public class PlayerMap : MonoBehaviour
                             {
                                 if (!stove.GetComponent<Stove>().hasItem)
                                 {
-                                    Action newAction = new Action("replacePanInStove", new Vector3(stove.position.x, stove.position.y, -1), stove, i);
+                                    Action newAction = new Action("replacePanInStove", new Vector3(stove.position.x, stove.position.y, -1), stove, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -356,7 +369,7 @@ public class PlayerMap : MonoBehaviour
                             {
                                 if (plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.empty && !InPlayer(plate))
                                 {
-                                    Action newAction = new Action("deliverSoupInPlateOnion", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                    Action newAction = new Action("deliverSoupInPlateOnion", new Vector3(plate.position.x, plate.position.y, -1), plate, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -372,7 +385,7 @@ public class PlayerMap : MonoBehaviour
                             Soup soup = pan.GetComponent<Pan>().soup;
                             if (!InPlayer(pan) && soup.gameObject.GetComponent<Soup>().isDone() && soup.type() == Item.type.onion)     //free
                             {
-                                Action newAction = new Action("getSoupFromPanOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                Action newAction = new Action("getSoupFromPanOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
                         }
@@ -386,7 +399,7 @@ public class PlayerMap : MonoBehaviour
                             Soup soup = pan.GetComponent<Pan>().soup;
                             if(!InPlayer(pan) && soup.gameObject.GetComponent<Soup>().canBoil() && soup.type() == Item.type.onion)
                             {
-                                Action newAction = new Action("boilSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                Action newAction = new Action("boilSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
 
@@ -404,7 +417,7 @@ public class PlayerMap : MonoBehaviour
                                     Soup soup = pan.GetComponent<Pan>().soup;
                                     if ((soup.type() == Item.type.onion || soup.type() == Item.type.none) && !soup.isDone())
                                     {
-                                        Action newAction = new Action("deliverCutedInSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                        Action newAction = new Action("deliverCutedInSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i + requestPriority * 10);
                                         possibleActions.Add(newAction);
                                     }
                                 }
@@ -424,7 +437,7 @@ public class PlayerMap : MonoBehaviour
                                 a = board.gameObject.GetComponent<CuttingBoard>().onTop.gameObject;
                                 if (a.name == "Onion(Clone)" && a.GetComponent<Food>().IsCut())
                                 {
-                                    Action newAction = new Action("getCutedOnion", new Vector3(board.position.x, board.position.y, -1), board, i);
+                                    Action newAction = new Action("getCutedOnion", new Vector3(board.position.x, board.position.y, -1), board, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -440,7 +453,7 @@ public class PlayerMap : MonoBehaviour
                             {
                                 if(food.gameObject.name == "Onion(Clone)" && food.gameObject.GetComponent<Food>().IsCut())
                                 {
-                                    Action newAction = new Action("useCuttingBoard", new Vector3(c.position.x, c.position.y, -1), c, i);
+                                    Action newAction = new Action("useCuttingBoard", new Vector3(c.position.x, c.position.y, -1), c, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -456,9 +469,10 @@ public class PlayerMap : MonoBehaviour
                         {
                             foreach(Transform c in this.cuttingBoards)
                             {
-                                if (!c.gameObject.GetComponent<CuttingBoard>().hasItem)
+                                if (true)
                                 {
-                                    Action newAction = new Action("deliverUncutedOnion", new Vector3(c.position.x, c.position.y, -1), c, i);
+                                    Debug.Log("Agent: " + this.gameObject.GetComponent<Agent>().GetId() + "  trying to deliver uncuted onion");
+                                    Action newAction = new Action("deliverUncutedOnion", new Vector3(c.position.x, c.position.y, -1), c, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -474,13 +488,13 @@ public class PlayerMap : MonoBehaviour
                         {
                             if (!onion.gameObject.GetComponent<Food>().IsCut() && !InPlayer(onion))     //exists but not cut and not in player possession
                             {
-                                Action newAction = new Action("getOnion", new Vector3(onion.position.x, onion.position.y, -1), onion, i);
+                                Action newAction = new Action("getOnion", new Vector3(onion.position.x, onion.position.y, -1), onion, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
                         }
                         foreach (Vector3 v in this.onionDisp)
                         {
-                            Action newAction = new Action("getNewOnion", new Vector3(v.x, v.y, -1), null, i);
+                            Action newAction = new Action("getNewOnion", new Vector3(v.x, v.y, -1), null, i + requestPriority * 10);
                             possibleActions.Add(newAction);
                         }
                     }
@@ -497,7 +511,7 @@ public class PlayerMap : MonoBehaviour
                     {
                         if (this.plates.Contains(WhatImCarrying()) && WhatImCarrying().gameObject.GetComponent<Plate>().GetState() == Plate.State.tomSoup)
                         {
-                            Action newAction = new Action("deliverSoupTomato", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), this.delivery, i);
+                            Action newAction = new Action("deliverSoupTomato", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), this.delivery, i + requestPriority * 10);
                             possibleActions.Add(newAction);
                         }
                     }
@@ -508,7 +522,7 @@ public class PlayerMap : MonoBehaviour
                     {
                         if (this.plates.Contains(WhatImCarrying()) && WhatImCarrying().gameObject.GetComponent<Plate>().GetState() == Plate.State.tomato)
                         {
-                            Action newAction = new Action("deliverPlateTomato", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), this.delivery, i);
+                            Action newAction = new Action("deliverPlateTomato", new Vector3(this.delivery.position.x, this.delivery.position.y, -1), this.delivery, i + requestPriority * 10);
                             possibleActions.Add(newAction);
                         }
                     }
@@ -520,7 +534,7 @@ public class PlayerMap : MonoBehaviour
                         {
                             if (plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.tomato && !InPlayer(plate))
                             {
-                                Action newAction = new Action("getPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                Action newAction = new Action("getPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
                         }
@@ -535,7 +549,7 @@ public class PlayerMap : MonoBehaviour
                         {
                             if (plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.tomSoup && !InPlayer(plate))
                             {
-                                Action newAction = new Action("getPlateSoupTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                Action newAction = new Action("getPlateSoupTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
                         }
@@ -551,7 +565,7 @@ public class PlayerMap : MonoBehaviour
                             {
                                 if (plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.empty && !InPlayer(plate))
                                 {
-                                    Action newAction = new Action("deliverSoupInPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                    Action newAction = new Action("deliverSoupInPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -567,7 +581,7 @@ public class PlayerMap : MonoBehaviour
                             Soup soup = pan.GetComponent<Pan>().soup;
                             if (!InPlayer(pan) && soup.gameObject.GetComponent<Soup>().isDone() && soup.type() == Item.type.tomato)     //free
                             {
-                                Action newAction = new Action("getSoupFromPanTomato", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                Action newAction = new Action("getSoupFromPanTomato", new Vector3(pan.position.x, pan.position.y, -1), pan, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
                         }
@@ -582,7 +596,7 @@ public class PlayerMap : MonoBehaviour
                             Soup soup = pan.GetComponent<Pan>().soup;
                             if (!InPlayer(pan) && soup.gameObject.GetComponent<Soup>().canBoil() && soup.type() == Item.type.tomato)
                             {
-                                Action newAction = new Action("boilSoupTomato", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                Action newAction = new Action("boilSoupTomato", new Vector3(pan.position.x, pan.position.y, -1), pan, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
 
@@ -603,7 +617,7 @@ public class PlayerMap : MonoBehaviour
                                     Soup soup = pan.GetComponent<Pan>().soup;
                                     if ((soup.type() == Item.type.tomato || soup.type() == Item.type.none) && !soup.isDone())
                                     {
-                                        Action newAction = new Action("deliverCutedInSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i);
+                                        Action newAction = new Action("deliverCutedInSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), pan, i + requestPriority * 10);
                                         possibleActions.Add(newAction);
                                     }
                                 }
@@ -623,7 +637,7 @@ public class PlayerMap : MonoBehaviour
                                 {
                                     if(!InPlayer(plate) && plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.empty)
                                     {
-                                        Action newAction = new Action("deliverCutedInPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i);
+                                        Action newAction = new Action("deliverCutedInPlateTomato", new Vector3(plate.position.x, plate.position.y, -1), plate, i + requestPriority * 10);
                                         possibleActions.Add(newAction);
                                     }
                                 }
@@ -644,7 +658,7 @@ public class PlayerMap : MonoBehaviour
                                 a = board.gameObject.GetComponent<CuttingBoard>().onTop.gameObject;
                                 if (a.name == "Tomato(Clone)" && a.GetComponent<Food>().IsCut())
                                 {
-                                    Action newAction = new Action("getCutedTomato", new Vector3(board.position.x, board.position.y, -1), board, i);
+                                    Action newAction = new Action("getCutedTomato", new Vector3(board.position.x, board.position.y, -1), board, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -661,7 +675,7 @@ public class PlayerMap : MonoBehaviour
                             {
                                 if (food.gameObject.name == "Tomato(Clone)" && food.gameObject.GetComponent<Food>().IsCut())
                                 {
-                                    Action newAction = new Action("useCuttingBoard", new Vector3(c.position.x, c.position.y, -1), c, i);
+                                    Action newAction = new Action("useCuttingBoard", new Vector3(c.position.x, c.position.y, -1), c, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -678,9 +692,10 @@ public class PlayerMap : MonoBehaviour
                         {
                             foreach (Transform c in this.cuttingBoards)
                             {
-                                if(!c.gameObject.GetComponent<CuttingBoard>().hasItem)
+                                if (true)
                                 {
-                                    Action newAction = new Action("deliverUncutedTomato", new Vector3(c.position.x, c.position.y, -1), c, i);
+                                    Debug.Log("Agent: " + this.gameObject.GetComponent<Agent>().GetId() + "  trying to deliver uncuted tomato");
+                                    Action newAction = new Action("deliverUncutedTomato", new Vector3(c.position.x, c.position.y, -1), c, i + requestPriority * 10);
                                     possibleActions.Add(newAction);
                                 }
                             }
@@ -697,13 +712,13 @@ public class PlayerMap : MonoBehaviour
                         {
                             if (!tomato.gameObject.GetComponent<Food>().IsCut() && !InPlayer(tomato))     //exists but not cut and not in player possession
                             {
-                                Action newAction = new Action("getTomato", new Vector3(tomato.position.x, tomato.position.y, -1), tomato, i);
+                                Action newAction = new Action("getTomato", new Vector3(tomato.position.x, tomato.position.y, -1), tomato, i + requestPriority * 10);
                                 possibleActions.Add(newAction);
                             }
                         }
                         foreach (Vector3 v in this.tomatoDisp)
                         {
-                            Action newAction = new Action("getNewTomato", new Vector3(v.x, v.y, -1), null, i);
+                            Action newAction = new Action("getNewTomato", new Vector3(v.x, v.y, -1), null, i + requestPriority * 10);
                             possibleActions.Add(newAction);
                         }
                     }
@@ -716,10 +731,40 @@ public class PlayerMap : MonoBehaviour
         }
         if(possibleActions.Count == 0)
         {
+            Debug.Log("Agent: " + this.gameObject.GetComponent<Agent>().GetId() + "   Its empty mate");
             Action newAction = new Action("empty", new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y, -1), this.gameObject.transform, i);
             possibleActions.Add(newAction);
         }
         return possibleActions;
+    }
+
+    public List<Action> GetPossibleDropActions()
+    {
+        List<Action> possibleActions = new List<Action>();
+
+        if (pans.Contains(WhatImCarrying()))
+        {
+            foreach(Transform stove in this.stoves)
+            {
+                if (!stove.gameObject.GetComponent<Stove>().hasItem)
+                {
+                    possibleActions.Add(new Action("drop", new Vector3(stove.position.x, stove.position.y, -1), stove, 0));
+                    
+                }
+            }
+            return possibleActions;
+        }
+
+        foreach(Transform v in usableBalcony)
+        {
+            if (!v.gameObject.GetComponent<Counter>().hasItem && (v.position - this.gameObject.transform.position).magnitude <10 )
+            {
+                possibleActions.Add(new Action("drop", new Vector3(v.position.x, v.position.y, -1), v, 0));
+                if(possibleActions.Count == 3) { return possibleActions; } //Already has 3 possible places to drop item
+            }
+        }
+        return possibleActions;
+
     }
 
     private bool InPlayer(Transform t)
@@ -800,5 +845,7 @@ public class PlayerMap : MonoBehaviour
     {
         this.bestTasks = bestTasks;
     }
+
+    
 
 }   

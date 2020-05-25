@@ -81,8 +81,11 @@ public class FoodRequests : MonoBehaviour
         return false;
     }
 
-    public Plate.State lastRequest()
+    public List<Plate.State> last2Request()
     {
-        return requests[0];
+        List<Plate.State> temp = new List<Plate.State>();
+        temp.Add(requests[0]);
+        //temp.Add(requests[1]);
+        return temp;
     }
 }

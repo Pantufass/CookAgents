@@ -22,11 +22,13 @@ public class Agent : MonoBehaviour
 
     private Task currentTask = null;
 
-    private int delay = 2;
+    private int delay = 1;
 
     private int pathSize = 0;
 
     private bool stoped = false;
+
+    private bool dropCarrying = false;
 
     // Start is called before the first frame update
     void Start()
@@ -40,14 +42,11 @@ public class Agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(delay > 0)
-        {
-            delay--;
-        }
+        if (delay > 0) delay--;
         else
         {
             Perceive();
-            delay = 2;
+            delay = 1;
         }
         
     }
@@ -60,11 +59,35 @@ public class Agent : MonoBehaviour
         if(currentTask == null)
         {
             Debug.Log("currentTask = null");
-            int taskId = 0;
-            Plate.State request = GetMostRecentRequest();
-            List<Action> actions = GetPossibleActionsForRequest(request);
+            List<Plate.State> requests = GetMostRecentRequest();
+            for(int i = 0; i < requests.Count; i++)
+            {
+                Plate.State request = requests[i];
+                List<Action> actions = GetPossibleActionsForRequest(request, i);
 
-            foreach (Action a in actions)
+                foreach (Action a in actions)
+                {
+
+                    Vector3 goal = a.GetGoal1();
+
+                    List<List<Vector3>> possiblePaths = map.FindPossiblePaths(this.transform.position, goal);
+
+                    foreach (List<Vector3> path in possiblePaths)
+                    {
+                        Task possibleTask = new Task(this.gameObject, i, a, path);
+                        possibleTasks.Add(possibleTask);
+                    }
+
+                }
+            }
+        }
+        else if (dropCarrying)      //task he was performing is over and he has something related in hands 
+        {
+            Debug.Log("DROPING SOMETHING");
+            dropCarrying = false;
+            List<Action> dropActions = map.GetPossibleDropActions();
+
+            foreach (Action a in dropActions)
             {
 
                 Vector3 goal = a.GetGoal1();
@@ -73,7 +96,7 @@ public class Agent : MonoBehaviour
 
                 foreach (List<Vector3> path in possiblePaths)
                 {
-                    Task possibleTask = new Task(this.gameObject, taskId++, a, path);
+                    Task possibleTask = new Task(this.gameObject, -1, a, path);             //task id == -1 because it is not the same as everyone elses tasks
                     possibleTasks.Add(possibleTask);
                 }
 
@@ -102,8 +125,7 @@ public class Agent : MonoBehaviour
             iterationTasks.Add(new AgentTasksInfo(this, possibleTasks, currentTask));
             if (iterationTasks.Count == otherPlayers.Count + 1)
             {
-                Debug.Log("lets gooo");
-                Debug.Log(iterationTasks.Count);
+
                 Decide();
             }
         }
@@ -137,7 +159,7 @@ public class Agent : MonoBehaviour
 
     private void Act(Task task)
     {
-        //Debug.Log("Agent: " + id + "   Doing: " + task.GetAction().GetActionType());
+        Debug.Log("Agent: " + id + "   Doing: " + task.GetAction().GetActionType());
         if(currentTask == null)
         {
             currentTask = task;
@@ -149,6 +171,11 @@ public class Agent : MonoBehaviour
         List<Vector3> path = currentTask.GetPath();
 
         if (currentTask.GetAction().GetGoal2() != null && (currentTask.GetAction().GetGoal1().x != currentTask.GetAction().GetGoal2().position.x || currentTask.GetAction().GetGoal1().y != currentTask.GetAction().GetGoal2().position.y) && (currentTask.GetAction().GetGoal2().position.x != this.gameObject.transform.position.x || currentTask.GetAction().GetGoal2().position.y != this.gameObject.transform.position.y))
+        {
+            currentTask = null;
+            return;
+        }
+        if (currentTask.GetAction().GetActionType().Equals("empty"))
         {
             currentTask = null;
             return;
@@ -195,8 +222,17 @@ public class Agent : MonoBehaviour
         else
         {
             controller.RotateTowards(currentTask.GetAction().GetGoal1());
-
-            if (currentTask.GetAction().GetActionType().IndexOf("getCuted") > -1)
+            if (currentTask.GetAction().GetActionType().Equals("drop"))
+            {
+                Debug.Log("Agent: " + this.id + " dropping  item");
+                Use();
+                this.currentTask = null;
+            }
+            else if (currentTask.GetAction().GetActionType().Equals("empty"))
+            {
+                this.currentTask = null;
+            }
+            else if (currentTask.GetAction().GetActionType().IndexOf("getCuted") > -1)
             {
                 Use();
                 this.currentTask = null;
@@ -216,7 +252,7 @@ public class Agent : MonoBehaviour
                 }
                 
             }
-            else if(currentTask.GetAction().GetActionType().IndexOf("getPlateSoupOnion") > -1)
+            else if(currentTask.GetAction().GetActionType().IndexOf("getPlate") > -1)
             {
                 Use();
                 foreach (Transform t in this.gameObject.transform)
@@ -235,7 +271,7 @@ public class Agent : MonoBehaviour
                 this.currentTask = null;
                 
             }
-            else if(currentTask.GetAction().GetActionType().IndexOf("deliverCutedInSoup") > -1)
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliverCutedInSoup") > -1 || currentTask.GetAction().GetActionType().IndexOf("deliverCutedInPlate") > -1)
             {
                 Transform carrying = null;
                 foreach(Transform t in this.gameObject.transform)
@@ -250,7 +286,6 @@ public class Agent : MonoBehaviour
                 Use();
                 if(transform.childCount > 0)
                 {
-                    Debug.Log("Deleting onion");
                 }
                 else
                 {
@@ -273,10 +308,23 @@ public class Agent : MonoBehaviour
                 Use();
                 this.currentTask = null;
             }
-            else if(currentTask.GetAction().GetActionType().IndexOf("deliverSoupOnion") > -1)
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliverSoup") > -1 || currentTask.GetAction().GetActionType().IndexOf("deliverPlate") > -1)
             {
                 Use();
-                this.currentTask = null;
+                FinishRequest();
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliverUncuted") > -1)
+            {
+                if (currentTask.GetAction().GetGoal2().gameObject.GetComponent<CuttingBoard>().hasItem)
+                {
+                    Debug.Log("Agent: " + this.id + " cant deliver uncuted");
+                    currentTask = null;
+                }
+                else
+                {
+                    Use();
+                    this.currentTask = null;
+                }
             }
             else if(currentTask.GetAction().GetActionType().IndexOf("deliver") > -1 || currentTask.GetAction().GetActionType().IndexOf("use") > -1)
             {
@@ -288,6 +336,36 @@ public class Agent : MonoBehaviour
 
         }
 
+    }
+
+    private void  FinishRequest()
+    {
+        int taskId = currentTask.GetId();
+        foreach(GameObject g in otherPlayers)
+        {
+            g.GetComponent<Agent>().StopRequest(taskId);
+        }
+        currentTask = null;
+    }
+
+    public void StopRequest(int taskId)
+    {
+        if (currentTask == null)
+        {
+            return;
+        }
+        Debug.Log("Agent: " + this.id + " They are trying to stop me");
+        Debug.Log("Agent: " + this.id + " My id: " + currentTask.GetId());
+
+        Debug.Log("Agent: " + this.id + " Their id: " + taskId);
+        if (currentTask.GetId() == taskId)
+        {
+            currentTask = null;
+            if(this.transform.childCount > 0)
+            {
+                dropCarrying = true;
+            }
+        }
     }
 
     private bool PlayerInThatPosition(Vector3 v)
@@ -331,18 +409,18 @@ public class Agent : MonoBehaviour
     }
 
 
-    private Plate.State GetMostRecentRequest()
+    private List<Plate.State> GetMostRecentRequest()
     {
-        Plate.State test = this.controller.LastRequest();
+        List<Plate.State> test = this.controller.LastRequest();
         return test;
 
     }
 
-    private List<Action> GetPossibleActionsForRequest(Plate.State request)
+    private List<Action> GetPossibleActionsForRequest(Plate.State request, int requestPriority)
     {
         List<string> options = requestConverter.GetConversion(request);
 
-        return map.GetPossibleActions(options);
+        return map.GetPossibleActions(options, requestPriority);
        
     }
 
@@ -368,7 +446,6 @@ public class Agent : MonoBehaviour
     private void ReceiveAgentTasks(AgentTasksInfo tasks)
     {
         iterationTasks.Add(tasks);
-        Debug.Log(iterationTasks.Count);
         if (iterationTasks.Count == otherPlayers.Count + 1)
         {
             Debug.Log("lets gooo");
