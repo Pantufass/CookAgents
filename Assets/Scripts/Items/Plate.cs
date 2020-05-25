@@ -120,5 +120,10 @@ public class Plate : Recipient
         full = false;
         GetComponent<SpriteRenderer>().sprite = empty;
     }
+
+    public State GetState()
+    {
+        return s;
+    }
     
 }

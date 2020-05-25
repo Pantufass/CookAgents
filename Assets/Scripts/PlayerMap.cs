@@ -19,7 +19,7 @@ public class PlayerMap : MonoBehaviour
 
     private List<Vector3> intersections = new List<Vector3>();
 
-    private List<Vector3> stoves = new List<Vector3>();
+    private List<Transform> stoves = new List<Transform>();
 
     private List<Vector3> onionDisp = new List<Vector3>();
 
@@ -83,6 +83,11 @@ public class PlayerMap : MonoBehaviour
             GameObject pan = GameObject.Find("Pan" + i);
             this.pans.Add(pan.transform);
         }
+        for (int i = 1; i < 4; i++)
+        {
+            GameObject plate = GameObject.Find("Plate" + i);
+            this.plates.Add(plate.transform);
+        }
 
     }
 
@@ -93,7 +98,7 @@ public class PlayerMap : MonoBehaviour
             switch (t.gameObject.name)
             {
                 case "Stove":
-                    this.stoves.Add(new Vector3(t.position.x, t.position.y, -1));
+                    this.stoves.Add(t);
                     break;
 
                 case "OnionDisp":
@@ -279,18 +284,65 @@ public class PlayerMap : MonoBehaviour
                         }
                     }
                     break;
-
-                case "getOnionSoup":
-                    foreach(Transform soup in this.soups)
+                case "replacePanInStove":
+                    if (carrying)
                     {
-                        if (!InPlayer(soup.parent) && !carrying)     //free
+                        if (this.pans.Contains(WhatImCarrying()) && WhatImCarrying().GetComponent<Pan>().soup.type() == Item.type.none)
                         {
-                            foreach(Transform p in this.plates) //verify that is in a plate or a pan, TODO
+                            foreach (Transform stove in this.stoves)
                             {
-
+                                if (!stove.GetComponent<Stove>().hasItem)
+                                {
+                                    Action newAction = new Action("replacePanInStove", new Vector3(stove.position.x, stove.position.y, -1), new Vector3());
+                                    possibleActions.Add(newAction);
+                                }
                             }
-                            Action newAction = new Action("getOnionSoup", new Vector3(soup.position.x, soup.position.y, -1), new Vector3());
-                            possibleActions.Add(newAction);
+                        }
+                    }
+                    break;
+                case "deliverSoupInPlateOnion":
+                    if (carrying)
+                    {
+                        if (this.pans.Contains(WhatImCarrying()) && WhatImCarrying().GetComponent<Pan>().soup.isDone() && WhatImCarrying().GetComponent<Pan>().soup.type() == Item.type.onion)
+                        {
+                            foreach(Transform plate in this.plates)
+                            {
+                                if (plate.gameObject.GetComponent<Plate>().GetState() == Plate.State.empty && !InPlayer(plate))
+                                {
+                                    Action newAction = new Action("deliverSoupInPlateOnion", new Vector3(plate.position.x, plate.position.y, -1), new Vector3());
+                                    possibleActions.Add(newAction);
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case "getSoupFromPanOnion":
+                    if (!carrying)
+                    {
+                        foreach(Transform pan in this.pans)
+                        {
+                            Soup soup = pan.GetComponent<Pan>().soup;
+                            if (!InPlayer(pan) && soup.gameObject.GetComponent<Soup>().isDone() && soup.type() == Item.type.onion)     //free
+                            {
+                                Action newAction = new Action("getSoupFromPanOnion", new Vector3(pan.position.x, pan.position.y, -1), new Vector3());
+                                possibleActions.Add(newAction);
+                            }
+                        }
+                    }
+                    break;
+                case "boilSoupOnion":
+                    if (!carrying)
+                    {
+                        foreach(Transform pan in this.pans)
+                        {
+                            Soup soup = pan.GetComponent<Pan>().soup;
+                            if(!InPlayer(pan) && soup.gameObject.GetComponent<Soup>().canBoil() && soup.type() == Item.type.onion)
+                            {
+                                Action newAction = new Action("boilSoupOnion", new Vector3(pan.position.x, pan.position.y, -1), new Vector3());
+                                possibleActions.Add(newAction);
+                            }
+
                         }
                     }
                     break;
@@ -419,6 +471,15 @@ public class PlayerMap : MonoBehaviour
             }
         }
         return false;
+    }
+
+    private Transform WhatImCarrying()
+    {
+        foreach(Transform child in this.gameObject.transform)
+        {
+            return child;
+        }
+        return null;
     }
 
 

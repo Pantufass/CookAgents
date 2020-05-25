@@ -96,8 +96,10 @@ public class PlayerController : MonoBehaviour
             {
                 if (pan)
                 {
+                    Debug.Log("Yes its a fcking pan");
                     if (c.addPan(hold as Pan))
                     {
+                        Debug.Log("meti?");
                         holding = false;
                         pan = false;
                     }

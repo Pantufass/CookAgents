@@ -45,7 +45,6 @@ public class Agent : MonoBehaviour
         else
         {
             Perceive();
-            delay = 2;
         }
         
     }
@@ -57,7 +56,6 @@ public class Agent : MonoBehaviour
 
         if(currentTask == null)
         {
-            Debug.Log("currentTask = null");
             int taskId = 0;
             Plate.State request = GetMostRecentRequest();
             List<Action> actions = GetPossibleActionsForRequest(request);
@@ -111,7 +109,6 @@ public class Agent : MonoBehaviour
     private void Decide()
     {
         List<AgentDecisionTask> bestTasks = policy.RationalDecision(this.iterationTasks);
-        Debug.Log("BestTask :" + bestTasks);
         this.iterationTasks = new List<AgentTasksInfo>();
         foreach(AgentDecisionTask adt in bestTasks)
         {
@@ -174,18 +171,28 @@ public class Agent : MonoBehaviour
             if (currentTask.GetAction().GetActionType().Equals("getCutedOnion"))
             {
                 Use();
+                this.currentTask = null;
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("getNew") > -1)
+            {
+                PickUp();
+                foreach (Transform t in this.gameObject.transform)
+                {
+                    UpdateMaps(t);
+                    this.currentTask = null;
+                }
+                
             }
             else if(currentTask.GetAction().GetActionType().IndexOf("get") > -1)
             {
                 PickUp();
 
-                if(currentTask.GetAction().GetActionType().IndexOf("getNew") > -1)
+                foreach(Transform t in this.gameObject.transform)
                 {
-                    foreach(Transform t in this.gameObject.transform)
-                    {
-                        UpdateMaps(t);
-                    }
+                    this.currentTask = null;
+                    return;
                 }
+                
             }
             else if(currentTask.GetAction().GetActionType().IndexOf("deliverCutedInSoup") > -1)
             {
@@ -195,15 +202,43 @@ public class Agent : MonoBehaviour
                     carrying = t;
                     break;
                 }
+                if(carrying != null)
+                {
+                    DeleteFromMaps(carrying);
+                }
                 Use();
-                DeleteFromMaps(carrying);
+                if(transform.childCount > 0)
+                {
+                    Debug.Log("Deleting onion");
+                }
+                else
+                {
+                    this.currentTask = null;
+                }
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("boilSoup") > -1)
+            {
+                PickUp();
+                PickUp();
+                this.currentTask = null;
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("getSoupFromPan") > -1)
+            {
+                Use();
+                this.currentTask = null;
+            }
+            else if(currentTask.GetAction().GetActionType().IndexOf("deliverSoupInPlateOnion") > -1)
+            {
+                PickUp();
+                this.currentTask = null;
             }
             else if(currentTask.GetAction().GetActionType().IndexOf("deliver") > -1 || currentTask.GetAction().GetActionType().IndexOf("use") > -1)
             {
                 Use();
+                this.currentTask = null;
             }
 
-            this.currentTask = null;
+
 
         }
 

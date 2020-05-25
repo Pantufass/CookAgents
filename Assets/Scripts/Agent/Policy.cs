@@ -29,8 +29,6 @@ public class Policy
 
         if(bestSet == null)
         {
-            Debug.Log("Null best set");
-            Debug.Log("Size: " + agentTasks.Count);
             foreach(AgentTasksInfo a in agentTasks)
             {
                 Debug.Log(a.GetIterationTasks().Count);
