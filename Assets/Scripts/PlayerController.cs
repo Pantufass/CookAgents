@@ -155,7 +155,7 @@ public class PlayerController : MonoBehaviour
 
     public List<Plate.State> LastRequest()
     {
-        return fr.last2Request();
+        return fr.Last2Request();
     }
 
     public bool holdItem(Item i)

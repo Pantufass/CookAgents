@@ -34,13 +34,13 @@ public class FoodRequests : MonoBehaviour
         requests.Add(Plate.State.salad);
     }
 
-    private void Update()
+    /*private void LateUpdate()
     {
         if(requests.Count < 5)
         {
             createRequest();
         }
-    }
+    }*/
 
     private void createRequest()
     {
@@ -51,6 +51,7 @@ public class FoodRequests : MonoBehaviour
 
     public Sprite getRecipe(int i)
     {
+        Debug.Log("Requests size: " + requests.Count);
         switch (requests[i])
         {
             case Plate.State.lettuce:
@@ -74,6 +75,7 @@ public class FoodRequests : MonoBehaviour
             if(plate == s)
             {
                 requests.Remove(s);
+                createRequest();
                 ar.changeThem();
                 return true;
             }
@@ -81,11 +83,11 @@ public class FoodRequests : MonoBehaviour
         return false;
     }
 
-    public List<Plate.State> last2Request()
+    public List<Plate.State> Last2Request()
     {
         List<Plate.State> temp = new List<Plate.State>();
         temp.Add(requests[0]);
-        //temp.Add(requests[1]);
+        temp.Add(requests[1]);
         return temp;
     }
 }

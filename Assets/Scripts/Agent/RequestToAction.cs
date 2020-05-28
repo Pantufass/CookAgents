@@ -8,9 +8,10 @@ public class RequestToAction
 
     public RequestToAction()
     {
-        conversion.Add(Plate.State.onSoup, new List<string>(new string[] { "deliverSoupOnion","getPlateSoupOnion", "replacePanInStove", "deliverSoupInPlateOnion", "getSoupFromPanOnion","boilSoupOnion", "deliverCutedInSoupOnion", "getCutedOnion", "cutOnion","deliverUncutedOnion", "getOnion" }));
-        conversion.Add(Plate.State.tomato, new List<string>(new string[] { "deliverPlateTomato", "getPlateTomato", "deliverCutedInPlateTomato", "getCutedTomato", "cutTomato", "deliverUncutedTomato", "getTomato" }));
-        conversion.Add(Plate.State.tomSoup, new List<string>(new string[] { "deliverSoupTomato", "getPlateSoupTomato", "replacePanInStove", "deliverSoupInPlateTomato", "getSoupFromPanTomato", "boilSoupTomato", "deliverCutedInSoupTomato", "getCutedTomato", "cutTomato", "deliverUncutedTomato", "getTomato" }));
+        conversion.Add(Plate.State.onSoup, new List<string>(new string[] { "deliver","getPlate", "replacePanInStove", "deliverSoupInPlate_Onion", "getSoupFromPan_Onion","boilSoup_Onion", "deliverCutedInSoup_Onion", "getCuted_Onion", "cut_Onion","deliverUncuted_Onion", "get_Onion" }));
+        conversion.Add(Plate.State.tomato, new List<string>(new string[] { "deliver", "getPlate", "deliverCutedInPlate_Tomato", "getCuted_Tomato", "cut_Tomato", "deliverUncuted_Tomato", "get_Tomato" }));
+        conversion.Add(Plate.State.tomSoup, new List<string>(new string[] { "deliver", "getPlate", "replacePanInStove", "deliverSoupInPlateTomato", "getSoupFromPan_Tomato", "boilSoup_Tomato", "deliverCutedInSoup_Tomato", "getCuted_Tomato", "cut_Tomato", "deliverUncuted_Tomato", "get_Tomato" }));
+        conversion.Add(Plate.State.salad, new List<string>(new string[] { "deliver", "getPlate", "deliverCutedInPlate_Lettuce", "getCuted_Lettuce", "cut_Lettuce", "deliverUncuted_Lettuce", "get_Lettuce", "deliverCutedInPlate_Tomato", "getCuted_Tomato", "cut_Tomato", "deliverUncuted_Tomato", "get_Tomato" }));
     }
 
     public List<string> GetConversion(Plate.State state)

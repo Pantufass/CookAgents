@@ -5,7 +5,7 @@ using UnityEngine;
 public class Policy
 {
 
-    private readonly int collisionPenalty = 1;
+    private readonly int collisionPenalty = 200;
     private readonly int concurrencyPenalty = 50;
     private readonly int bonusForProximity = 50;
     private readonly int priorityPenalty = 2;

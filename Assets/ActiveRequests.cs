@@ -25,6 +25,7 @@ public class ActiveRequests : MonoBehaviour
 
     public void changeThem()
     {
+        Debug.Log("Panels size: " + panels.Count);
         for (int i = 0; i < panels.Count; i++)
         {
             panels[i].sprite = fr.getRecipe(i);
