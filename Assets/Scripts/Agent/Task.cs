@@ -12,7 +12,7 @@ public class Task
 
     protected Vector3 targetPos;
 
-    protected bool firstThere = false;
+    protected bool there = false;
     public enum action { cut, pickUp, boil, move, drop}
 
     public bool holding = false;
@@ -47,10 +47,26 @@ public class Task
     public bool[] getDirection(Agent agent)
     {
         bool[] b = new bool[4];
-        b[0] = agent.transform.position.x > targetPos.x;
-        b[1] = agent.transform.position.x < targetPos.x;
-        b[2] = agent.transform.position.y > targetPos.y;
-        b[3] = agent.transform.position.y < targetPos.y;
+        Vector3 a = agent.transform.position;
+        //move
+        b[0] = a.x > targetPos.x;
+        b[1] = a.x < targetPos.x;
+        b[2] = a.y < targetPos.y;
+        b[3] = a.y > targetPos.y;
+
+
+        return b;
+
+    }
+
+    public bool[] turnTo(Agent a, Vector3 front)
+    {
+        bool[] b = new bool[2];
+        Vector3 p = a.transform.position + front;
+
+        //rotate
+        b[0] = a.transform.position + front != targetPos;
+        b[1] = false;
 
         return b;
 
@@ -75,8 +91,8 @@ public class Task
     public virtual bool gotThere(Agent agent)
     {
         Vector3 auxPos = agent.transform.position;
-        firstThere = Vector3.Distance(auxPos, targetPos) < 1.5f;
-        if (firstThere)
+        there = Vector3.Distance(auxPos, targetPos) < 1.5f;
+        if (there)
         {
             switch (original.t)
             {
@@ -93,7 +109,7 @@ public class Task
         }
         
 
-        return firstThere;
+        return there;
     }
 
     public bool moving()

@@ -33,18 +33,23 @@ public class FoodTask : Task
     public override bool gotThere(Agent agent)
     {
         Vector3 auxPos = agent.transform.position;
-        firstThere = Vector3.Distance(auxPos, targetPos) < 1.5f;
+        there = Vector3.Distance(auxPos, targetPos) < 1.5f;
 
-        if (firstThere && !part1) this.a = action.pickUp; 
-
-        if (part1)
+        if (there)
         {
-            this.a = action.cut;
-            Debug.Log("LETS CUT");
+            if (part1)
+            {
+                this.a = action.cut;
+                Debug.Log("LETS CUT");
+            }
+            else
+            {
+                this.a = action.pickUp;
+            }
         }
 
 
-        return firstThere;
+        return there;
     }
 
     public bool cutting()

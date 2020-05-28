@@ -298,27 +298,34 @@ public class Agent : MonoBehaviour
             commands.Add(false);
         }
 
-        commands[4] = Random.Range(0, 2) == 0;
-
-        switch (currentTask.a)
+        if(currentTask != null)
         {
-            case Task.action.move:
-                bool[] b = currentTask.getDirection(this);
-                for(int i = 0; i < b.Length; i++)
-                {
-                    commands[i] = b[i];
-                }
-                break;
-            case Task.action.pickUp:
-                commands[7] = true;
-                break;
-            case Task.action.drop:
-                commands[7] = true;
-                break;
-            default:
-                commands[6] = true;
-                break;
+            bool[] t = currentTask.turnTo(this, controller.front);
+            for (int i = 0; i < t.Length; i++)
+            {
+                commands[i+4] = t[i];
+            }
+            switch (currentTask.a)
+            {
+                case Task.action.move:
+                    bool[] b = currentTask.getDirection(this);
+                    for (int i = 0; i < b.Length; i++)
+                    {
+                        commands[i] = b[i];
+                    }
+                    break;
+                case Task.action.pickUp:
+                    commands[7] = true;
+                    break;
+                case Task.action.drop:
+                    commands[7] = true;
+                    break;
+                default:
+                    commands[6] = true;
+                    break;
+            }
         }
+       
 
         controller.cycle(commands);
     }

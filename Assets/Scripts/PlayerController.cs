@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private List<Vector3> positions;
 
     private Item hold;
-    private Vector3 front;
+    public Vector3 front;
     private BoxCollider2D col;
 
     private bool pan = false;
@@ -25,7 +25,11 @@ public class PlayerController : MonoBehaviour
     private PlayerController[] players;
 
     //able/disable agent control
-    private bool agentControl = false;
+    private bool agentControl = true;
+
+    int xValue = 0;
+    int yValue = 0;
+    int up = 0;
     public PlayerController(Agent agent)
     {
         this.agent = agent;
@@ -68,7 +72,9 @@ public class PlayerController : MonoBehaviour
 
     public void cycle(List<bool> commands)
     {
-        int xValue = 0, yValue = 0, up = 0;
+        xValue = 0;
+        yValue = 0;
+        up = 0;
 
 
         //move left
@@ -117,23 +123,45 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        Vector3 a = transform.position + new Vector3(xValue, yValue);
-        if (positions.Contains(a) && canMove(a))
+        if (canMove())
         {
             front += new Vector3(xValue, yValue);
-            transform.position = a;
+            transform.position = transform.position + new Vector3(xValue, yValue);
         }
         transform.Rotate(up * new Vector3(0, 0, 1), 90f);
         front = Quaternion.AngleAxis(90, up * new Vector3(0, 0, 1)) * front;
     }
 
-    bool canMove(Vector3 a)
+    bool isTherePLayer(Vector3 pos)
     {
-        foreach(PlayerController p in players)
+        foreach (PlayerController p in players)
         {
-            if (p.transform.position == a) return false;
+            if (p.transform.position == pos)
+            {
+                return true;
+            }
         }
-        return true;
+        return false;
+    }
+
+    bool canMove()
+    {
+        Vector3 a = transform.position + new Vector3(xValue, yValue);
+        Vector3 pos = transform.position;
+            if (positions.Contains(a))
+                if (!isTherePLayer(a)) return true;
+        
+        a += new Vector3(-xValue, 0);
+        int aux = xValue;
+        xValue = 0;
+        if (positions.Contains(a) && a != transform.position)
+            if (!isTherePLayer(a)) return true;
+        xValue = aux;
+        a += new Vector3(xValue, -yValue);
+        yValue = 0;
+        if (positions.Contains(a) && a != transform.position)
+            if (!isTherePLayer(a)) return true;
+        return false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
