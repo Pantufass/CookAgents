@@ -179,11 +179,6 @@ public class PlayerController : MonoBehaviour
         Vector3 difference = target - this.gameObject.transform.position;
         this.up = 0;
 
-        /*while(target != this.gameObject.transform.position + this.gameObject.transform.forward)
-        {
-            transform.Rotate(1 * new Vector3(0, 0, 1), 90f);
-            this.up++;
-        }*/
         if (difference.y < 0)
         {
             RotateDown();

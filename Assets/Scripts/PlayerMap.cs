@@ -441,7 +441,7 @@ public class PlayerMap : MonoBehaviour
                 case "get":
                     if (!carrying)
                     {
-                        ActionTypeToActionConverter.Get(possibleActions, i, requestIndex, foodType, otherPlayers, foods, foodDisp);
+                        ActionTypeToActionConverter.Get(possibleActions, i, requestIndex, foodType, otherPlayers, foods, foodDisp, this.cuttingBoards);
                     }
                     break;
 

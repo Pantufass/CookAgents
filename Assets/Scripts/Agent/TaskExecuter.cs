@@ -125,120 +125,154 @@ public class TaskExecuter
             controller.RotateTowards(currentTask.GetAction().GetGoal1());
             if (currentTask.GetAction().GetActionType().Equals("drop"))
             {
-                Debug.Log("Agent: " + this.id + " dropping  item");
                 PickUp();
-                if (me.transform.childCount > 0)
+                if (me.transform.childCount == 0)
                 {
-                    PickUp();
+                    this.currentTask = null;
                 }
-                this.currentTask = null;
             }
             else if (currentTask.GetAction().GetActionType().Equals("empty"))
             {
                 this.currentTask = null;
             }
-            else if (currentTask.GetAction().GetActionType().IndexOf("getCuted") > -1)
-            {
-                Use();
-                this.currentTask = null;
-            }
-            else if (currentTask.GetAction().GetActionType().IndexOf("getSoupFromPan") > -1)
-            {
-                Use();
-                this.currentTask = null;
-            }
-            else if (currentTask.GetAction().GetActionType().IndexOf("getNew") > -1)
-            {
-                Debug.Log("Agent: " + this.id + " getting new");
-                Use();
-                foreach (Transform t in this.me.transform)
-                {
-                    UpdateMaps(t);
-                    this.currentTask = null;
-                }
-
-            }
-            else if (currentTask.GetAction().GetActionType().IndexOf("getPlate") > -1)
-            {
-                Use();
-                foreach (Transform t in this.me.transform)
-                {
-                    this.currentTask = null;
-                }
-            }
             else if (currentTask.GetAction().GetActionType().IndexOf("get") > -1)
             {
-                PickUp();
-
-                foreach (Transform t in this.me.transform)
-                {
-
-                }
-                this.currentTask = null;
-
+                GetActions();
             }
-            else if (currentTask.GetAction().GetActionType().IndexOf("deliverCutedInSoup") > -1 || currentTask.GetAction().GetActionType().IndexOf("deliverCutedInPlate") > -1)
+            else if (currentTask.GetAction().GetActionType().IndexOf("deliver") > -1)
             {
-                Transform carrying = null;
-                foreach (Transform t in this.me.transform)
-                {
-                    carrying = t;
-                    break;
-                }
-                if (carrying != null)
-                {
-                    DeleteFromMaps(carrying);
-                }
+                DeliverActions();
+            }
+            else if (currentTask.GetAction().GetActionType().IndexOf("use") > -1)
+            {
                 Use();
-                if (this.me.transform.childCount > 0)
-                {
-                }
-                else
-                {
-                    this.currentTask = null;
-                }
+                this.currentTask = null;
             }
             else if (currentTask.GetAction().GetActionType().IndexOf("boilSoup") > -1)
-            {
-                PickUp();
-                PickUp();
-                this.currentTask = null;
-            }
-            else if (currentTask.GetAction().GetActionType().IndexOf("deliverSoupInPlate") > -1)
             {
                 Use();
                 this.currentTask = null;
             }
             else if (currentTask.GetAction().GetActionType().Equals("replacePanInStove"))
             {
-                Use();
-                this.currentTask = null;
-            }
-            else if (currentTask.GetAction().GetActionType().IndexOf("deliverSoup") > -1 || currentTask.GetAction().GetActionType().IndexOf("deliverPlate") > -1)
-            {
-                Use();
-                FinishRequest();
-            }
-            else if (currentTask.GetAction().GetActionType().IndexOf("deliverUncuted") > -1)
-            {
-                if (currentTask.GetAction().GetGoal2().gameObject.GetComponent<CuttingBoard>().hasItem)
+                PickUp();
+                if (me.transform.childCount == 0)
                 {
-                    Debug.Log("Agent: " + this.id + " cant deliver uncuted");
-                    currentTask = null;
-                }
-                else
-                {
-                    Use();
                     this.currentTask = null;
                 }
             }
-            else if (currentTask.GetAction().GetActionType().IndexOf("deliver") > -1 || currentTask.GetAction().GetActionType().IndexOf("use") > -1)
+
+
+        }
+
+    }
+
+    private void GetActions()
+    {
+        if (currentTask.GetAction().GetActionType().IndexOf("getNew") > -1)
+        {
+            Debug.Log("Agent: " + this.id + " getting new");
+            Use();
+            PickUp();
+
+            foreach (Transform t in this.me.transform)
             {
-                Use();
+                if(t.gameObject.name.IndexOf("Pan") > -1)
+                {
+                    PickUp();
+                    this.currentTask = null;
+                    return;
+                }
+                UpdateMaps(t);
+                this.currentTask = null;
+            }
+        }
+        else if (currentTask.GetAction().GetActionType().IndexOf("getCuted") > -1 || currentTask.GetAction().GetActionType().IndexOf("getSoupFromPan") > -1 || currentTask.GetAction().GetActionType().IndexOf("getPlate") > -1)
+        {
+            PickUp();
+            if (me.transform.childCount > 0)
+            {
                 this.currentTask = null;
             }
 
+        }
+        else        //get
+        {
+            PickUp();
+            if (me.transform.childCount > 0)
+            {
+                this.currentTask = null;
+            }
+        }
 
+    }
+
+    private void DeliverActions()
+    {
+        if (currentTask.GetAction().GetActionType().IndexOf("deliverUncuted") > -1)
+        {
+            if (currentTask.GetAction().GetGoal2().gameObject.GetComponent<CuttingBoard>().hasItem)
+            {
+                Debug.Log("Agent: " + this.id + " cant deliver uncuted");
+                currentTask = null;
+            }
+            else
+            {
+                PickUp();
+                if(me.transform.childCount == 0)
+                {
+                    this.currentTask = null;
+                }
+            }
+        }
+        else if (currentTask.GetAction().GetActionType().IndexOf("deliverCutedInSoup") > -1)
+        {
+            if (StillPossibleToDeliver())
+            {
+                if (this.me.transform.childCount == 0)
+                {
+                    this.currentTask = null;
+                    return;
+                }
+                foreach (Transform t in this.me.transform)
+                {
+                    DeleteFromMaps(t);
+                }
+                PickUp();
+
+            }
+            else
+            {
+                this.currentTask = null;
+            }
+        }
+        else if (currentTask.GetAction().GetActionType().IndexOf("deliverCutedInPlate") > -1){
+
+
+            if (this.me.transform.childCount == 0)
+            {
+                this.currentTask = null;
+                return;
+            }
+            foreach (Transform t in this.me.transform)
+            {
+                DeleteFromMaps(t);
+            }
+            PickUp();
+
+        }
+        else if (currentTask.GetAction().GetActionType().IndexOf("deliverSoupInPlate") > -1)
+        {
+            PickUp();
+            this.currentTask = null;
+        }
+        else        //deliver
+        {
+            PickUp();
+            if (me.transform.childCount == 0)
+            {
+                this.currentTask = null;
+            }
 
         }
 
@@ -288,7 +322,7 @@ public class TaskExecuter
         return false;
     }
 
-    private void PickUp()
+    private void Use()
     {
         List<bool> com = new List<bool>();
         com.Add(false);
@@ -302,7 +336,7 @@ public class TaskExecuter
         controller.Act(com);
     }
 
-    private void Use()
+    private void PickUp()
     {
         List<bool> com = new List<bool>();
         com.Add(false);
@@ -333,5 +367,15 @@ public class TaskExecuter
         {
             g.GetComponent<PlayerMap>().DeleteFromMap(t);
         }
+    }
+
+    private bool StillPossibleToDeliver()
+    {
+        foreach(Transform food in me.transform)
+        {
+            return (food.gameObject.GetComponent<Food>().GetType() == currentTask.GetAction().GetGoal2().gameObject.GetComponent<Pan>().GetType() || currentTask.GetAction().GetGoal2().gameObject.GetComponent<Pan>().GetType() == Item.type.none);
+
+        }
+        return false;
     }
 }

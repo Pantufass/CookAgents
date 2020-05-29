@@ -58,4 +58,8 @@ public class Pan : Recipient
         soup.Boiled();
     }
 
+    public Item.type GetType()
+    {
+        return this.soup.type();
+    }
 }

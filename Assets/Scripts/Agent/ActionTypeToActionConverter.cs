@@ -5,15 +5,27 @@ using UnityEngine;
 public static class ActionTypeToActionConverter
 {
     static readonly int actionTypeImportance = 2;
-    static readonly int requestImportance = 10;
+    static readonly int requestImportance = 5;
 
-    public static void Get(List<Action> possibleActions, int typeIndex, int requestIndex, string foodType, List<GameObject> otherPlayers, List<Transform> foods, List<Vector3> foodDisp)
+    public static void Get(List<Action> possibleActions, int typeIndex, int requestIndex, string foodType, List<GameObject> otherPlayers, List<Transform> foods, List<Vector3> foodDisp, List<Transform> cuttingBoards)
     {
         foreach (Transform food in foods)
         {
-            if (!food.gameObject.GetComponent<Food>().IsCut() && !InPlayer(otherPlayers, food))     //exists but not cut and not in player possession
+            bool free = true;
+            foreach (Transform c in cuttingBoards)
             {
-                ActionTypeToActionConverter.AddAction(possibleActions, "get" + foodType, new Vector3(food.position.x, food.position.y, -1), food, typeIndex, requestIndex);
+                if (c.gameObject.GetComponent<CuttingBoard>().onTop != null && c.gameObject.GetComponent<CuttingBoard>().onTop.gameObject.Equals(food.gameObject))
+                {
+                    free = false;
+                }
+
+            }
+            if (free)
+            {
+                if (!food.gameObject.GetComponent<Food>().IsCut() && !InPlayer(otherPlayers, food))     //exists but not cut and not in player possession
+                {
+                    ActionTypeToActionConverter.AddAction(possibleActions, "get" + foodType, new Vector3(food.position.x, food.position.y, -1), food, typeIndex, requestIndex);
+                }
             }
         }
         foreach (Vector3 v in foodDisp)
@@ -44,13 +56,16 @@ public static class ActionTypeToActionConverter
     {
         foreach (Transform c in cuttingBoards)
         {
-            foreach (Transform food in c)
+            GameObject food = null;
+            if (c.gameObject.GetComponent<CuttingBoard>().onTop != null)
             {
-                if (food.gameObject.name == (foodType + "(Clone)") && food.gameObject.GetComponent<Food>().IsCut())
+                food = c.gameObject.GetComponent<CuttingBoard>().onTop.gameObject;
+                if (food.name == (foodType + "(Clone)") && !food.GetComponent<Food>().IsCut())
                 {
                     ActionTypeToActionConverter.AddAction(possibleActions, "useCuttingBoard", new Vector3(c.position.x, c.position.y, -1), c, typeIndex, requestIndex);
                 }
             }
+
         }
     }
 

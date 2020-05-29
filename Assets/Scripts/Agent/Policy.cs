@@ -7,8 +7,8 @@ public class Policy
 
     private readonly int collisionPenalty = 200;
     private readonly int concurrencyPenalty = 50;
-    private readonly int bonusForProximity = 50;
-    private readonly int priorityPenalty = 2;
+    private readonly int bonusForProximity = 100;
+    private readonly int priorityPenalty = 5;
 
     private TaskSet bestSet;
 
