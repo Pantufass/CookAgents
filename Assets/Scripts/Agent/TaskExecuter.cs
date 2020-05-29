@@ -125,6 +125,7 @@ public class TaskExecuter
             controller.RotateTowards(currentTask.GetAction().GetGoal1());
             if (currentTask.GetAction().GetActionType().Equals("drop"))
             {
+                Debug.Log("Agent: " + this.id + " droppp");
                 PickUp();
                 if (me.transform.childCount == 0)
                 {
@@ -155,6 +156,7 @@ public class TaskExecuter
             }
             else if (currentTask.GetAction().GetActionType().Equals("replacePanInStove"))
             {
+                if(this.currentTask.GetAction().GetGoal2().gameObject.GetComponent<Stove>().onTop != null) { this.currentTask = null; return; }
                 PickUp();
                 if (me.transform.childCount == 0)
                 {
@@ -171,7 +173,7 @@ public class TaskExecuter
     {
         if (currentTask.GetAction().GetActionType().IndexOf("getNew") > -1)
         {
-            Debug.Log("Agent: " + this.id + " getting new");
+
             Use();
             PickUp();
 
@@ -185,16 +187,27 @@ public class TaskExecuter
                 }
                 UpdateMaps(t);
                 this.currentTask = null;
+                return;
             }
+            this.currentTask = null;
         }
-        else if (currentTask.GetAction().GetActionType().IndexOf("getCuted") > -1 || currentTask.GetAction().GetActionType().IndexOf("getSoupFromPan") > -1 || currentTask.GetAction().GetActionType().IndexOf("getPlate") > -1)
+        else if (currentTask.GetAction().GetActionType().IndexOf("getCuted") > -1)
         {
+
+            if (!this.currentTask.GetAction().GetGoal2().gameObject.GetComponent<CuttingBoard>().hasItem) { this.currentTask = null; return; }
             PickUp();
             if (me.transform.childCount > 0)
             {
                 this.currentTask = null;
             }
 
+        }
+        else if(currentTask.GetAction().GetActionType().IndexOf("getSoupFromPan") > -1 || currentTask.GetAction().GetActionType().IndexOf("getPlate") > -1){
+            PickUp();
+            if (me.transform.childCount > 0)
+            {
+                this.currentTask = null;
+            }
         }
         else        //get
         {
@@ -213,7 +226,6 @@ public class TaskExecuter
         {
             if (currentTask.GetAction().GetGoal2().gameObject.GetComponent<CuttingBoard>().hasItem)
             {
-                Debug.Log("Agent: " + this.id + " cant deliver uncuted");
                 currentTask = null;
             }
             else
@@ -295,16 +307,12 @@ public class TaskExecuter
         {
             return;
         }
-        Debug.Log("Agent: " + this.id + " They are trying to stop me");
-        Debug.Log("Agent: " + this.id + " My id: " + currentTask.GetId());
-
-        Debug.Log("Agent: " + this.id + " Their id: " + taskId);
         if (currentTask.GetId() == taskId)
         {
             currentTask = null;
             if (this.me.transform.childCount > 0)
             {
-                Debug.Log("Agent: " + this.id + " Have child to drop");
+
                 dropCarrying = true;
             }
         }

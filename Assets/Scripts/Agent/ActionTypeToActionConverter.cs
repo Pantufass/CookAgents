@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class ActionTypeToActionConverter
 {
-    static readonly int actionTypeImportance = 2;
+    static readonly int actionTypeImportance = 5;
     static readonly int requestImportance = 5;
 
     public static void Get(List<Action> possibleActions, int typeIndex, int requestIndex, string foodType, List<GameObject> otherPlayers, List<Transform> foods, List<Vector3> foodDisp, List<Transform> cuttingBoards)
